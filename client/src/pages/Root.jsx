@@ -5,6 +5,10 @@ export const Root = () => {
   return (
     <Routes>
       <Route path="/*" element={<HomePage />} />
+      <Route
+        path="/influential/:subfieldId"
+        element={<div>Influential page</div>}
+      />
     </Routes>
   );
 };
