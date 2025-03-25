@@ -1,7 +1,6 @@
 import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
 
 export default [
   {
@@ -23,10 +22,7 @@ export default [
       es2020: true,
       node: true,
     },
-    plugins: {
-      "react-hooks": reactHooks,
-      "react-refresh": reactRefresh,
-    },
+    plugins: ["react-refresh", "mui-path-imports", "@tanstack/query"],
     extends: [
       "eslint:recommended",
       "plugin:react/recommended",
