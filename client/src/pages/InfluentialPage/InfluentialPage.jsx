@@ -6,7 +6,7 @@ import FaceIcon from "@mui/icons-material/Face";
 import ArticleIcon from "@mui/icons-material/Article";
 import { InfluBreadcrumbs } from "./units/InfluBreadcrumbs/InfluBreadcrumbs";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { TopicsTab } from "./tabs/TopicsTab/TopicsTab";
 import { WorksTab } from "./tabs/WorksTab/WorksTab";
 import { AuthorsTab } from "./tabs/AuthorsTab/AuthorsTab";
@@ -21,13 +21,19 @@ const getTabValue = (name) => {
       return 0;
   }
 };
+
 export const InfluentialPage = () => {
   const { subfieldId, tabName } = useParams();
+  const {
+    state: { subfieldName },
+  } = useLocation();
   const [tabValue, setTabValue] = useState(getTabValue(tabName));
   const navigate = useNavigate();
 
   const handleClickTab = (tabName) => {
-    navigate(`/influential/${subfieldId}/${tabName}`);
+    navigate(`/influential/${subfieldId}/${tabName}`, {
+      state: { subfieldName },
+    });
     setTabValue(getTabValue(tabName));
   };
 
@@ -51,10 +57,9 @@ export const InfluentialPage = () => {
           wordWrap: "break-word",
           marginTop: 1,
           marginBottom: 4,
-          textTransform: "capitalize",
         }}
       >
-        Influentials
+        {subfieldName}
       </Typography>
 
       {/* Tabs */}

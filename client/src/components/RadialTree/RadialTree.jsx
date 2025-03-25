@@ -220,7 +220,10 @@ export const RadialTree = ({ data }) => {
             "https://openalex.org/subfields/",
             ""
           );
-          navigate(`/influential/${subfieldId}`);
+          let subfieldName = d.data.name;
+          navigate(`/influential/${subfieldId}`, {
+            state: { subfieldName },
+          });
         }
       });
 
