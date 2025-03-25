@@ -8,7 +8,10 @@ export const Root = () => {
     <PageLayout>
       <Routes>
         <Route path="/*" element={<HomePage />} />
-        <Route path="/influential/:subfieldId" element={<InfluentialPage />} />
+        <Route element={<InfluentialPage />}>
+          <Route path="/influential/:subfieldId/" />
+          <Route path="/influential/:subfieldId/:tabName" />
+        </Route>
       </Routes>
     </PageLayout>
   );

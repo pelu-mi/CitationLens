@@ -8,7 +8,7 @@ export const LogoIcon = (props) => {
   return (
     <SvgIcon {...props}>
       <svg
-        xml:space="preserve"
+        xmlSpace="preserve"
         width="200"
         height="42"
         data-version="2"
