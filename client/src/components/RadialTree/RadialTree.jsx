@@ -25,7 +25,7 @@ export const RadialTree = ({ data }) => {
       .attr("width", width)
       .attr("height", height)
       .attr("viewBox", [0, 0, width, height])
-      .attr("style", "width: 80%; height: 80vh; font: 16px sans-serif;");
+      .attr("style", "width: 100%; height: 80vh; font: 16px sans-serif;");
 
     // Create a container group for zooming
     const container = svg.append("g").attr("class", "container");

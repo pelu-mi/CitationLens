@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { openAlexApiClient } from "../../services/openAlexApiClient";
 import { RadialTree } from "../../components/RadialTree/RadialTree";
+import { Typography } from "@mui/material";
 
 async function fetchAllOpenAlexData(endpoint) {
   const allResults = [];
@@ -102,10 +103,19 @@ export const HomePage = () => {
     getData();
   }, []);
   return (
-    <div>
-      <h3>Overview</h3>
+    <>
+      <Typography
+        variant="h4"
+        sx={{
+          wordWrap: "break-word",
+          marginY: 4,
+          textTransform: "capitalize",
+        }}
+      >
+        Overview
+      </Typography>
 
       <RadialTree data={treeData} />
-    </div>
+    </>
   );
 };

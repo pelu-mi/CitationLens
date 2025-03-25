@@ -1,7 +1,18 @@
+import { Typography } from "@mui/material";
+
 export const InfluentialPage = () => {
   return (
-    <div>
-      <h3>Influential Page</h3>
-    </div>
+    <>
+      <Typography
+        variant="h4"
+        sx={{
+          wordWrap: "break-word",
+          marginY: 4,
+          textTransform: "capitalize",
+        }}
+      >
+        Influential Page
+      </Typography>
+    </>
   );
 };
