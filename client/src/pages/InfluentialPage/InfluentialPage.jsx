@@ -1,17 +1,20 @@
 import { Typography } from "@mui/material";
+import { InfluBreadcrumbs } from "./components/InfluBreadcrumbs/InfluBreadcrumbs";
 
 export const InfluentialPage = () => {
   return (
     <>
+      <InfluBreadcrumbs />
       <Typography
         variant="h4"
         sx={{
           wordWrap: "break-word",
-          marginY: 4,
+          marginTop: 1,
+          marginButtom: 4,
           textTransform: "capitalize",
         }}
       >
-        Influential Page
+        Influentials
       </Typography>
     </>
   );
