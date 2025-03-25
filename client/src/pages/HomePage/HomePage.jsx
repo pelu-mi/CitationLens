@@ -1,25 +1,31 @@
 import { useEffect, useState } from "react";
 import { RadialTree } from "../../components/RadialTree/RadialTree";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { fetchDomainsHierarchy } from "../../services/api/home/fetchDomainsHierarchy";
+import { Loader } from "../../components/Loader/Loader";
 
 export const HomePage = () => {
   const [treeData, setTreeData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const getData = async () => {
+      setLoading(true);
       try {
         const hierarchyData = await fetchDomainsHierarchy();
         setTreeData(hierarchyData);
       } catch (err) {
         setError(err);
         console.error("Failed to load OpenAlex hierarchy:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     getData();
   }, []);
+
   return (
     <>
       <Typography
@@ -33,7 +39,9 @@ export const HomePage = () => {
         Overview
       </Typography>
 
-      <RadialTree data={treeData} />
+      <Box sx={{ width: "100%", height: "80vh" }}>
+        {loading ? <Loader /> : <RadialTree data={treeData} />}
+      </Box>
     </>
   );
 };
