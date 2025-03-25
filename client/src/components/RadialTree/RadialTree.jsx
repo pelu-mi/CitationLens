@@ -119,6 +119,13 @@ export const RadialTree = ({ data }) => {
       .text((d) => d.data.name)
       .attr("class", "label")
       .on("mouseenter", (event, hoveredNode) => {
+        // Reset any previous hover state before applying new highlighting
+        container
+          .selectAll(".node, .link, .label")
+          .transition()
+          .duration(0)
+          .style("opacity", 1);
+
         // Find path to root (domain) and children
         const nodePath = [];
         const nodeChildren = [];
@@ -196,13 +203,13 @@ export const RadialTree = ({ data }) => {
         // Restore all elements to original state
         nodes
           .transition()
-          .duration(200)
+          .duration(0)
           .style("opacity", 1)
           .attr("fill", (d) => (d.children ? "#555" : "#999"));
 
         links
           .transition()
-          .duration(200)
+          .duration(0)
           .style("opacity", 1)
           .attr("stroke", "#555")
           .attr("stroke-width", 1.5);
