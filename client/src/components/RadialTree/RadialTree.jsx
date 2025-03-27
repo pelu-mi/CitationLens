@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { useNavigate } from "react-router";
+import { extractId } from "../../utils/extractId";
 
 export const RadialTree = ({ data }) => {
   const svgRef = useRef(null);
@@ -25,7 +26,7 @@ export const RadialTree = ({ data }) => {
       .attr("width", width)
       .attr("height", height)
       .attr("viewBox", [0, 0, width, height])
-      .attr("style", "width: 100%; height: 100%; font: 16px sans-serif;");
+      .attr("style", "width: 100%; height: 100%; font: 18px sans-serif;");
 
     // Create a container group for zooming
     const container = svg.append("g").attr("class", "container");
@@ -38,7 +39,9 @@ export const RadialTree = ({ data }) => {
 
     // Sort the tree and apply the layout.
     const root = tree(
-      d3.hierarchy(data).sort((a, b) => d3.ascending(a.data.name, b.data.name))
+      d3
+        .hierarchy(data)
+        .sort((a, b) => d3.ascending(a.data.display_name, b.data.display_name))
     );
 
     // Zoom functionality
@@ -116,7 +119,7 @@ export const RadialTree = ({ data }) => {
       .attr("stroke-width", 3)
       .attr("fill", "currentColor")
       .style("cursor", (d) => (!d.children ? "pointer" : "default"))
-      .text((d) => d.data.name)
+      .text((d) => d.data.display_name)
       .attr("class", "label")
       .on("mouseenter", (event, hoveredNode) => {
         // Reset any previous hover state before applying new highlighting
@@ -223,11 +226,8 @@ export const RadialTree = ({ data }) => {
       .on("click", (event, d) => {
         // Only navigate for leaf nodes
         if (!d.children && d.data.id) {
-          let subfieldId = d.data.id.replace(
-            "https://openalex.org/subfields/",
-            ""
-          );
-          let subfieldName = d.data.name;
+          let subfieldId = extractId(d.data.id);
+          let subfieldName = d.data.display_name;
           navigate(`/influential/${subfieldId}`, {
             state: { subfieldName },
           });

@@ -7,10 +7,13 @@ export const Root = () => {
   return (
     <PageLayout>
       <Routes>
-        <Route path="/*" element={<HomePage />} />
-        <Route element={<InfluentialPage />}>
-          <Route path="/influential/:subfieldId/" />
-          <Route path="/influential/:subfieldId/:tabName" />
+        <Route path="/" element={<HomePage />}>
+          <Route path="*" />
+          <Route path=":domainId" />
+        </Route>
+        <Route path="/influential" element={<InfluentialPage />}>
+          <Route path=":subfieldId/" />
+          <Route path=":subfieldId/:tabName" />
         </Route>
       </Routes>
     </PageLayout>
