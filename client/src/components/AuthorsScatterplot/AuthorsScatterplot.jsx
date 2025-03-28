@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-export const AuthorsScatterplot = ({ authors, width = 600, height = 400 }) => {
+export const AuthorsScatterplot = ({ authors, width = 700, height = 500 }) => {
   const scatterplotRef = useRef(null);
   const tooltipRef = useRef(null);
 

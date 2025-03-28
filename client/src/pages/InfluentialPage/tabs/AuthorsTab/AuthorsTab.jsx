@@ -171,7 +171,16 @@ export const AuthorsTab = () => {
 
       <Divider orientation="vertical" />
 
-      <Grid2 size={9} padding={2}>
+      <Grid2
+        size={9}
+        paddingX={4}
+        paddingBottom={3}
+        paddingTop={6}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        overflow="auto"
+      >
         {loading || authors.length === 0 ? (
           <Loader />
         ) : (

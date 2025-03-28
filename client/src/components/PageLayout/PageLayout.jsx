@@ -18,6 +18,7 @@ export const PageLayout = ({ children }) => {
           body,
           #root {
             height: 100%;
+            overflow-x: hidden;
           }
         `}
       />
