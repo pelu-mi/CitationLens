@@ -3,15 +3,25 @@
  */
 import PropTypes from "prop-types";
 
-import { Container } from "@mui/material";
+import { Container, css, GlobalStyles } from "@mui/material";
 import { NavBar } from "../NavBar/NavBar";
 
 /**
  * Page Layout
  */
-export const PageLayout = ({ children, disableFullHeight = false }) => {
+export const PageLayout = ({ children }) => {
   return (
     <>
+      <GlobalStyles
+        styles={css`
+          html,
+          body,
+          #root {
+            height: 100%;
+          }
+        `}
+      />
+
       <NavBar />
       <Container sx={{ paddingTop: "64px", height: "100%" }}>
         {children}

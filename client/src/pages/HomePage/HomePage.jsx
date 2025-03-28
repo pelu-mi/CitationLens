@@ -53,12 +53,13 @@ export const HomePage = () => {
   };
 
   return (
-    <>
+    <Box sx={{ height: "100%" }}>
       <Box
         display="flex"
         justifyContent="space-between"
         alignItems="center"
         flexWrap="wrap"
+        marginBottom={{ xs: 4, sm: 0 }}
       >
         <Typography
           variant="h4"
@@ -85,9 +86,9 @@ export const HomePage = () => {
         />
       </Box>
 
-      <Box sx={{ width: "100%", height: "80vh" }}>
-        {loading ? <Loader /> : <RadialTree data={selectedDomain} />}
+      <Box sx={{ width: "100%", height: "84%", maxHeight: "80vh" }}>
+        {loading ? <Loader /> : <RadialTree data={selectedDomain} />}{" "}
       </Box>
-    </>
+    </Box>
   );
 };
