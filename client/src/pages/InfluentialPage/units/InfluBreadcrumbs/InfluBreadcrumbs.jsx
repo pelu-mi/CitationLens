@@ -6,7 +6,7 @@ export const InfluBreadcrumbs = () => {
   return (
     <Breadcrumbs aria-label="breadcrumb" sx={{ mt: 4, fontSize: 12 }}>
       <Link underline="hover" color="inherit" href="/">
-        Overview
+        Domain Overview
       </Link>
       <Typography></Typography>
     </Breadcrumbs>
