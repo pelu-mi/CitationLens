@@ -53,8 +53,8 @@ export const AuthorsScatterplot = ({ authors, width = 700, height = 500 }) => {
       .call(d3.axisLeft(yScale))
       .append("text")
       .attr("transform", "rotate(-90)")
-      .attr("x", -plotHeight / 2)
-      .attr("y", -50)
+      .attr("x", -plotHeight / 2 + 50)
+      .attr("y", -60)
       .attr("fill", "black")
       .text("Number of Citations");
     // Tooltip
@@ -84,19 +84,48 @@ export const AuthorsScatterplot = ({ authors, width = 700, height = 500 }) => {
         const dotX = xScale(d.works_count);
         const dotY = yScale(d.cited_by_count);
 
-        tooltip.transition().duration(200).style("opacity", 0.9);
-
-        tooltip
-          .html(
-            `
+        // Set tooltip content first to measure its width
+        tooltip.html(
+          `
           <strong>${d.display_name}</strong><br/>
           Works: ${d.works_count}<br/>
           Citations: ${d.cited_by_count}
         `
-          )
-          .style("left", `${svgRect.left + dotX + 80}px`)
-          .style("top", `${svgRect.top + dotY + 20}px`)
-          .style("transform", "translateY(-50%)");
+        );
+
+        // Measure actual tooltip width
+        const tooltipNode = tooltipRef.current;
+        const measuredWidth = tooltipNode.offsetWidth;
+        const measuredHeight = tooltipNode.offsetHeight;
+
+        // Tooltip positioning logic
+        let left, top;
+
+        // Determine horizontal position
+        if (dotX + measuredWidth - 50 > plotWidth) {
+          // If tooltip would go beyond right edge, position it to the left of the dot
+          left = svgRect.left + dotX - measuredWidth + 50;
+        } else {
+          // Position to the right of the dot
+          left = svgRect.left + dotX + 90;
+        }
+
+        // Determine vertical position
+        if (dotY + measuredHeight > plotHeight) {
+          // If tooltip would go below the plot, position it above the dot
+          top = svgRect.top + dotY - measuredHeight + 60;
+        } else {
+          // Position below the dot
+          top = svgRect.top + dotY - 2;
+        }
+
+        tooltip
+          .transition()
+          .duration(200)
+          .style("left", `${left}px`)
+          .style("top", `${top}px`)
+          .style("opacity", 1)
+          .style("transform", "none");
       })
       .on("mouseout", function () {
         // Restore dot appearance
@@ -133,11 +162,8 @@ export const AuthorsScatterplot = ({ authors, width = 700, height = 500 }) => {
           boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
           zIndex: 10,
           maxWidth: "250px",
-          whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
-          top: 0,
-          left: 0,
         }}
       />
     </>
