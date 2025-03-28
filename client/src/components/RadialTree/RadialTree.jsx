@@ -7,6 +7,57 @@ export const RadialTree = ({ data }) => {
   const svgRef = useRef(null);
   const navigate = useNavigate();
 
+  // Color generation function to create distinct colors for branches
+  const generateBranchColors = (root) => {
+    const colorMap = new Map();
+
+    // Color palette with enough distinct colors
+    const baseColors = [
+      "#1f77b4", // Blue
+      "#ff7f0e", // Orange
+      "#2ca02c", // Green
+      "#d62728", // Red
+      "#9467bd", // Purple
+      "#8c564b", // Brown
+      "#e377c2", // Pink
+      "#7f7f7f", // Gray
+      "#bcbd22", // Olive
+      "#17becf", // Cyan
+      "#aec7e8", // Light Blue
+      "#ffbb78", // Light Orange
+      "#98df8a", // Light Green
+      "#ff9896", // Light Red
+      "#c5b0d5", // Lavender
+    ];
+
+    const assignUniqueColors = (node, depth = 0) => {
+      // If this is the root, assign the first color
+      if (depth === 0) {
+        colorMap.set(node, baseColors[0]);
+      }
+
+      // If node has children, assign colors to each child branch
+      if (node.children) {
+        node.children.forEach((child, index) => {
+          // Use a color from the palette, cycling through if needed
+          const colorIndex = (index + 1) % baseColors.length;
+          colorMap.set(child, baseColors[colorIndex]);
+
+          // Recursively assign colors to grandchildren
+          if (child.children) {
+            child.children.forEach((grandchild) => {
+              colorMap.set(grandchild, colorMap.get(child));
+            });
+          }
+        });
+      }
+
+      return colorMap;
+    };
+
+    return assignUniqueColors(root);
+  };
+
   useEffect(() => {
     if (!data || !svgRef.current) return;
 
@@ -44,6 +95,9 @@ export const RadialTree = ({ data }) => {
         .sort((a, b) => d3.ascending(a.data.display_name, b.data.display_name))
     );
 
+    // Generate branch colors
+    const branchColors = generateBranchColors(root);
+
     // Zoom functionality
     const zoom = d3
       .zoom()
@@ -59,7 +113,6 @@ export const RadialTree = ({ data }) => {
     const linkGroup = container
       .append("g")
       .attr("fill", "none")
-      .attr("stroke", "#555")
       .attr("stroke-opacity", 0.4)
       .attr("stroke-width", 1.5)
       .attr("class", "links");
@@ -76,6 +129,7 @@ export const RadialTree = ({ data }) => {
           .angle((d) => d.x)
           .radius((d) => d.y)
       )
+      .attr("stroke", (d) => branchColors.get(d.target) || "#555")
       .attr("class", "link");
 
     // Append nodes group
@@ -90,7 +144,10 @@ export const RadialTree = ({ data }) => {
         "transform",
         (d) => `rotate(${(d.x * 180) / Math.PI - 90}) translate(${d.y},0)`
       )
-      .attr("fill", (d) => (d.children ? "#555" : "#999"))
+      .attr("fill", (d) => {
+        if (d.children) return branchColors.get(d) || "#555";
+        return branchColors.get(d) || "#999";
+      })
       .attr("r", 2.5)
       .attr("class", "node");
 
@@ -163,13 +220,15 @@ export const RadialTree = ({ data }) => {
 
         // Highlight selected nodes and their path
         highlightNodes.forEach((node) => {
+          const nodeColor = branchColors.get(node) || "#3851DD";
+
           // Highlight nodes
           nodes
             .filter((d) => d === node)
             .transition()
             .duration(200)
             .style("opacity", 1)
-            .attr("fill", "#3851DD");
+            .attr("fill", nodeColor);
 
           // Highlight labels
           labels
@@ -177,7 +236,7 @@ export const RadialTree = ({ data }) => {
             .transition()
             .duration(200)
             .style("opacity", 1)
-            .attr("fill", "#3851DD");
+            .attr("fill", nodeColor);
 
           // Highlight links to this node
           links
@@ -185,22 +244,9 @@ export const RadialTree = ({ data }) => {
             .transition()
             .duration(200)
             .style("opacity", 1)
-            .attr("stroke", "#3851DD")
+            .attr("stroke", nodeColor)
             .attr("stroke-width", 3);
         });
-
-        // Restore hovered node
-        nodes
-          .filter((d) => d === hoveredNode)
-          .transition()
-          .duration(200)
-          .attr("fill", "#3851DD");
-
-        labels
-          .filter((d) => d === hoveredNode)
-          .transition()
-          .duration(200)
-          .attr("fill", "#3851DD");
       })
       .on("mouseleave", () => {
         // Restore all elements to original state
@@ -208,13 +254,16 @@ export const RadialTree = ({ data }) => {
           .transition()
           .duration(0)
           .style("opacity", 1)
-          .attr("fill", (d) => (d.children ? "#555" : "#999"));
+          .attr("fill", (d) => {
+            if (d.children) return branchColors.get(d) || "#555";
+            return branchColors.get(d) || "#999";
+          });
 
         links
           .transition()
           .duration(0)
           .style("opacity", 1)
-          .attr("stroke", "#555")
+          .attr("stroke", (d) => branchColors.get(d.target) || "#555")
           .attr("stroke-width", 1.5);
 
         labels
