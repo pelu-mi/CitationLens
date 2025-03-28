@@ -144,29 +144,33 @@ export const AuthorsTab = () => {
 
         <Divider />
 
-        <Box
-          sx={{
-            flexGrow: 1,
-            overflowY: "auto",
-          }}
-        >
-          <List
+        {topics.length === 0 ? (
+          <Loader />
+        ) : (
+          <Box
             sx={{
-              width: "100%",
-              p: 0,
+              flexGrow: 1,
+              overflowY: "auto",
             }}
           >
-            {topics.map((topic) => (
-              <ListItemButton
-                key={topic.id}
-                selected={selectedTopicId === topic.id}
-                onClick={() => handleListItemClick(topic.id)}
-              >
-                <ListItemText primary={topic.label} />
-              </ListItemButton>
-            ))}
-          </List>
-        </Box>
+            <List
+              sx={{
+                width: "100%",
+                p: 0,
+              }}
+            >
+              {topics.map((topic) => (
+                <ListItemButton
+                  key={topic.id}
+                  selected={selectedTopicId === topic.id}
+                  onClick={() => handleListItemClick(topic.id)}
+                >
+                  <ListItemText primary={topic.label} />
+                </ListItemButton>
+              ))}
+            </List>
+          </Box>
+        )}
       </Grid2>
 
       <Divider orientation="vertical" />
