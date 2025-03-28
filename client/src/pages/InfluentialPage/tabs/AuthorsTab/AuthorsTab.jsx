@@ -7,13 +7,78 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router";
+import { fetchAllOpenAlexData } from "../../../../services/helpers/fetchAllOpenAlexData";
+import { extractId } from "../../../../utils/extractId";
 
 export const AuthorsTab = () => {
-  const [selectedIndex, setSelectedIndex] = useState(1);
+  const { subfieldId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [topics, setTopics] = useState([]);
+  const [selectedTopicId, setSelectedTopicId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const {
+    state: { subfieldName },
+  } = location;
 
-  const handleListItemClick = (event, index) => {
-    setSelectedIndex(index);
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const topicParam = searchParams.get("topic");
+
+    const loadTopics = async () => {
+      try {
+        setLoading(true);
+        // Construct endpoint with subfieldId
+        const endpoint = `topics?filter=subfield.id:${subfieldId}`;
+        const topicsData = await fetchAllOpenAlexData(endpoint);
+
+        // Transform topics data into list items
+        const topicsList = topicsData.map((topic) => ({
+          label: topic.display_name,
+          id: extractId(topic.id),
+        }));
+
+        setTopics(topicsList);
+
+        // Set selected index based on URL parameter or default to first item
+        if (topicParam) {
+          const matchingTopic = topicsList.find(
+            (topic) => extractId(topic.id) === topicParam
+          );
+          if (matchingTopic) {
+            setSelectedTopicId(topicParam);
+          } else if (topicsList.length > 0) {
+            const firstTopicId = topicsList[0].id;
+            setSelectedTopicId(firstTopicId);
+          }
+        } else if (topicsList.length > 0) {
+          const firstTopicId = topicsList[0].id;
+          setSelectedTopicId(firstTopicId);
+        }
+      } catch (error) {
+        console.error("Error loading topics:", error);
+        setTopics([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (subfieldId) {
+      loadTopics();
+    }
+  }, [subfieldId, location.search, navigate, subfieldName]);
+
+  const handleListItemClick = (topicId) => {
+    // Navigate with the topic ID as a query parameter
+    navigate(`/influential/${subfieldId}/authors?topic=${topicId}`, {
+      state: {
+        subfieldName,
+      },
+    });
+
+    setSelectedTopicId(topicId);
   };
 
   return (
@@ -38,7 +103,8 @@ export const AuthorsTab = () => {
             margin: 2,
           }}
         >
-          Topics (34)
+          {topics.length > 1 ? "Topics" : "Topic"}{" "}
+          {topics.length > 0 && `(${topics.length})`}
         </Typography>
 
         <Divider />
@@ -55,30 +121,13 @@ export const AuthorsTab = () => {
               p: 0,
             }}
           >
-            {[
-              { label: "Trash", index: 1 },
-              { label: "Spam", index: 2 },
-              { label: "Trash", index: 3 },
-              { label: "Spam", index: 4 },
-              { label: "Trash", index: 5 },
-              { label: "Spam", index: 6 },
-              { label: "Trash", index: 7 },
-              { label: "Spam", index: 8 },
-              { label: "Trash", index: 9 },
-              { label: "Spam", index: 10 },
-              { label: "Trash", index: 11 },
-              { label: "Spam", index: 12 },
-              { label: "Trash", index: 3 },
-              { label: "Spam", index: 14 },
-              { label: "Trash", index: 15 },
-              { label: "Spam", index: 16 },
-            ].map((item, idx) => (
+            {topics.map((topic) => (
               <ListItemButton
-                key={idx}
-                selected={selectedIndex === item.index}
-                onClick={(event) => handleListItemClick(event, item.index)}
+                key={topic.id}
+                selected={selectedTopicId === topic.id}
+                onClick={() => handleListItemClick(topic.id)}
               >
-                <ListItemText primary={item.label} />
+                <ListItemText primary={topic.label} />
               </ListItemButton>
             ))}
           </List>
