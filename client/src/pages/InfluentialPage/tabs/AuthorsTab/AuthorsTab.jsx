@@ -11,6 +11,9 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { fetchAllOpenAlexData } from "../../../../services/helpers/fetchAllOpenAlexData";
 import { extractId } from "../../../../utils/extractId";
+import { openAlexApiClient } from "../../../../services/openAlexApiClient";
+import { Loader } from "../../../../components/Loader/Loader";
+import { AuthorsScatterplot } from "../../../../components/AuthorsScatterplot/AuthorsScatterplot";
 
 export const AuthorsTab = () => {
   const { subfieldId } = useParams();
@@ -18,11 +21,14 @@ export const AuthorsTab = () => {
   const location = useLocation();
   const [topics, setTopics] = useState([]);
   const [selectedTopicId, setSelectedTopicId] = useState(null);
+  const [authors, setAuthors] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const {
     state: { subfieldName },
   } = location;
 
+  // Fetch topics when component mounts or subfieldId changes
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const topicParam = searchParams.get("topic");
@@ -69,6 +75,35 @@ export const AuthorsTab = () => {
       loadTopics();
     }
   }, [subfieldId, location.search, navigate, subfieldName]);
+
+  // Fetch authors when selected topic changes
+  useEffect(() => {
+    const fetchAuthors = async () => {
+      if (!selectedTopicId) return;
+
+      try {
+        setLoading(true);
+        setAuthors([]);
+        const response = await openAlexApiClient.get(`/authors`, {
+          params: {
+            filter: `topics.id:${selectedTopicId}`,
+            sort: "cited_by_count:desc",
+            per_page: 50,
+          },
+        });
+
+        console.log("response", response);
+        setAuthors(response.data.results);
+      } catch (error) {
+        console.error("Error fetching authors:", error);
+        setAuthors([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAuthors();
+  }, [selectedTopicId]);
 
   const handleListItemClick = (topicId) => {
     // Navigate with the topic ID as a query parameter
@@ -137,7 +172,11 @@ export const AuthorsTab = () => {
       <Divider orientation="vertical" />
 
       <Grid2 size={9} padding={2}>
-        Scatterplot here
+        {loading || authors.length === 0 ? (
+          <Loader />
+        ) : (
+          <AuthorsScatterplot authors={authors} />
+        )}
       </Grid2>
     </Grid2>
   );
