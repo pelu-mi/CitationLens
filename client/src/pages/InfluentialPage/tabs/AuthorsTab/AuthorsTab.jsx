@@ -92,7 +92,6 @@ export const AuthorsTab = () => {
           },
         });
 
-        console.log("response", response);
         setAuthors(response.data.results);
       } catch (error) {
         console.error("Error fetching authors:", error);
