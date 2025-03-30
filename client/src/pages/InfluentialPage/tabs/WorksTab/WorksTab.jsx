@@ -1,23 +1,23 @@
-import { Typography } from "@mui/material";
-import { openAlexApiClient } from "../../../../services/openAlexApiClient";
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
+import { openAlexApiClient } from "../../../../services/openAlexApiClient";
+import { Loader } from "../../../../components/Loader/Loader";
+import { ForceDirectedGraph } from "../../../../components/ForceDirectedGraph/ForceDirectedGraph";
 
 export const WorksTab = () => {
   const { subfieldId } = useParams();
-
-  const [works, setWorks] = useState([]);
-  const [citations, setCitations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [works, setWorks] = useState([]);
+  const [error, setError] = useState(null);
 
-  // Fetch works when selected topic changes
   useEffect(() => {
     const fetchWorks = async () => {
       if (!subfieldId) return;
 
       try {
         setLoading(true);
-        setCitations([]);
+        setError(null);
+
         const response = await openAlexApiClient.get(`/works`, {
           params: {
             filter: `primary_topic.subfield.id:${subfieldId}`,
@@ -26,40 +26,12 @@ export const WorksTab = () => {
           },
         });
 
-        // Store the works in a map for quick lookup
-        const worksMap = new Map();
-        const worksList = response.data.results.map((work) => {
-          worksMap.set(work.id, work.display_name); // Store display name for quick reference
-          return {
-            id: work.id,
-            name: work.display_name, // Use name instead of URL
-            cited_by_count: work.cited_by_count,
-            primary_topic: work.primary_topic.display_name,
-            subfield: work.primary_topic.subfield.display_name,
-            referenced_works: work.referenced_works || [], // Store referenced works (array of links)
-          };
-        });
-
-        // Build citation
-        const citationsList = [];
-        worksList.forEach((work) => {
-          if (work.referenced_works.length > 0) {
-            work.referenced_works.forEach((referencedWork) => {
-              if (worksMap.has(referencedWork)) {
-                citationsList.push({
-                  source: work.name, // The work making the reference
-                  target: worksMap.get(referencedWork), // The work being referenced (get name from worksMap)
-                });
-              }
-            });
-          }
-        });
-
-        setWorks(worksList);
-        setCitations(citationsList);
+        if (response.data && response.data.results) {
+          setWorks(response.data.results);
+        }
       } catch (error) {
-        console.error("Error fetching authors:", error);
-        setCitations([]);
+        console.error("Error fetching works:", error);
+        setError("Failed to fetch works data");
       } finally {
         setLoading(false);
       }
@@ -68,19 +40,21 @@ export const WorksTab = () => {
     fetchWorks();
   }, [subfieldId]);
 
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
-    <>
-      <Typography
-        variant="h5"
-        sx={{
-          wordWrap: "break-word",
-          marginTop: 1,
-          marginBottom: 4,
-          textTransform: "capitalize",
-        }}
-      >
-        Works
-      </Typography>
-    </>
+    <div>
+      {works.length === 0 ? (
+        <div>No works found for this subfield</div>
+      ) : (
+        <ForceDirectedGraph works={works} />
+      )}
+    </div>
   );
 };
