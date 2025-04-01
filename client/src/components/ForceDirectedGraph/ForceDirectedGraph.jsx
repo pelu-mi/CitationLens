@@ -1,11 +1,12 @@
 // ForceDirectedGraph.jsx
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { assignRGBColor } from "../../utils/assignRGBColo";
 
 export const ForceDirectedGraph = ({ works }) => {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
+  const tooltipRef = useRef(null);
 
   useEffect(() => {
     if (!works.length || !svgRef.current) return;
@@ -26,6 +27,7 @@ export const ForceDirectedGraph = ({ works }) => {
       year: work.publication_year,
       citations: work.cited_by_count,
       type: work.type, // Use work type for node coloring
+      referencesCount: work.referenced_works ? work.referenced_works.length : 0,
     }));
 
     // Create links only for referenced works that exist in our 200 fetched works
@@ -55,6 +57,24 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("width", "100%")
       .attr("height", height)
       .attr("style", "max-width: 100%; height: auto; font: 12px sans-serif;");
+
+    // Create tooltip div
+    const tooltip = d3
+      .select(containerRef.current)
+      .append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("visibility", "hidden")
+      .style("background-color", "white")
+      .style("border", "1px solid #ddd")
+      .style("border-radius", "4px")
+      .style("padding", "10px")
+      .style("box-shadow", "0 2px 5px rgba(0,0,0,0.2)")
+      .style("pointer-events", "none")
+      .style("z-index", "10")
+      .style("max-width", "250px");
+
+    tooltipRef.current = tooltip.node();
 
     // Add zoom functionality
     const g = svg.append("g");
@@ -103,7 +123,9 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("stroke-opacity", 0.6)
       .attr("stroke-width", 1.5)
       .attr("fill", "none")
-      .attr("marker-end", "url(#arrow)");
+      .attr("marker-end", "url(#arrow)")
+      .attr("data-source", (d) => d.source.id || d.source)
+      .attr("data-target", (d) => d.target.id || d.target);
 
     // Create simulation
     const simulation = d3
@@ -115,8 +137,8 @@ export const ForceDirectedGraph = ({ works }) => {
           .id((d) => d.id)
           .distance(100)
       )
-      .force("charge", d3.forceManyBody().strength(-20)) // Reduced trength to make the graph more compact
-      .force("center", d3.forceCenter(0, 0))
+      .force("charge", d3.forceManyBody().strength(-20)) // Reduced strength to make the graph more compact
+      .force("center", d3.forceCenter(width / 2, height / 2)) // Center the graph in the SVG
       .force("collide", d3.forceCollide().radius(40));
 
     // Add nodes
@@ -125,7 +147,8 @@ export const ForceDirectedGraph = ({ works }) => {
       .selectAll("g")
       .data(nodes)
       .join("g")
-      .call(drag(simulation));
+      .call(drag(simulation))
+      .attr("data-id", (d) => d.id);
 
     // Node circles
     node
@@ -136,7 +159,101 @@ export const ForceDirectedGraph = ({ works }) => {
         return `rgb(${rgb.join(",")})`;
       })
       .attr("stroke", "#fff")
-      .attr("stroke-width", 1.5);
+      .attr("stroke-width", 1.5)
+      .on("mouseover", (event, d) => {
+        // Show tooltip
+        tooltip.style("visibility", "visible").html(`
+            <strong>${d.title}</strong><br>
+            Year: ${d.year || "N/A"}<br>
+            Citations: ${d.citations}<br>
+            References: ${d.referencesCount}<br>
+            Type: ${d.type}
+          `);
+
+        // Calculate tooltip position to stay within viewport
+        const tooltipWidth = tooltipRef.current.offsetWidth;
+        const tooltipHeight = tooltipRef.current.offsetHeight;
+        const svgRect = svgRef.current.getBoundingClientRect();
+        const transform = d3.zoomTransform(svg.node());
+
+        // Get transformed node position
+        const nodeX = transform.x + d.x * transform.k;
+        const nodeY = transform.y + d.y * transform.k;
+
+        // Calculate positioning relative to the SVG container
+        let tooltipX = nodeX + svgRect.left + 60; // to the right
+        let tooltipY = nodeY + svgRect.top - 10; // to above
+
+        // Adjust if tooltip would go beyond right edge of screen
+        if (tooltipX + tooltipWidth + 150 > window.innerWidth) {
+          tooltipX = nodeX + svgRect.left - tooltipWidth + 20; // Position to the left of node
+        }
+
+        // Adjust if tooltip would go beyond bottom edge of screen
+        if (tooltipY + tooltipHeight > window.innerHeight) {
+          tooltipY = window.innerHeight - tooltipHeight - 10;
+        }
+
+        // Adjust if tooltip would go beyond top edge of screen
+        if (tooltipY < 0) {
+          tooltipY = 10;
+        }
+
+        tooltip
+          .transition()
+          .duration(300)
+          .style("opacity", 1)
+          .style("left", `${tooltipX}px`)
+          .style("top", `${tooltipY}px`);
+
+        // Find neighbor nodes (connected nodes)
+        const neighbors = new Set();
+        links.forEach((link) => {
+          const sourceId =
+            typeof link.source === "object" ? link.source.id : link.source;
+          const targetId =
+            typeof link.target === "object" ? link.target.id : link.target;
+
+          if (sourceId === d.id) {
+            neighbors.add(targetId);
+          } else if (targetId === d.id) {
+            neighbors.add(sourceId);
+          }
+        });
+
+        // Dim all nodes and links
+        node.style("opacity", 0.2);
+        link.style("opacity", 0.1);
+
+        // Highlight hovered node and its neighbors
+        node
+          .filter((n) => n.id === d.id || neighbors.has(n.id))
+          .style("opacity", 1);
+
+        // Highlight connected links
+        link
+          .filter((l) => {
+            const sourceId =
+              typeof l.source === "object" ? l.source.id : l.source;
+            const targetId =
+              typeof l.target === "object" ? l.target.id : l.target;
+            return sourceId === d.id || targetId === d.id;
+          })
+          .style("opacity", 1)
+          .style("stroke", "#007bff")
+          .style("stroke-width", 2);
+      })
+      .on("mouseout", () => {
+        // Hide tooltip
+        tooltip.transition().duration(300).style("opacity", 0);
+
+        // Reset all nodes and links to original appearance
+        node.style("opacity", 1);
+        link
+          .style("opacity", 0.6)
+          .style("stroke", "#999")
+          .style("stroke-width", 1.5);
+      });
 
     // Fit view function to calculate appropriate zoom level
     const fitView = () => {
@@ -291,12 +408,16 @@ export const ForceDirectedGraph = ({ works }) => {
 
     return () => {
       simulation.stop();
+      // Remove tooltip when component unmounts
+      if (tooltipRef.current && tooltipRef.current.parentNode) {
+        tooltipRef.current.parentNode.removeChild(tooltipRef.current);
+      }
     };
   }, [works]);
 
   return (
     <div ref={containerRef} className="force-directed-graph">
-      <svg ref={svgRef} />
+      <svg ref={svgRef} style={{ position: "relative" }} />
     </div>
   );
 };
