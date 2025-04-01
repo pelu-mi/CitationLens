@@ -41,10 +41,13 @@ export const AuthorsTab = () => {
         const topicsData = await fetchAllOpenAlexData(endpoint);
 
         // Transform topics data into list items
-        const topicsList = topicsData.map((topic) => ({
-          label: topic.display_name,
-          id: extractId(topic.id),
-        }));
+        const topicsList = topicsData
+          .sort((a, b) => b.works_count - a.works_count)
+          .map((topic) => ({
+            label: topic.display_name,
+            worksCount: topic.works_count,
+            id: extractId(topic.id),
+          }));
 
         setTopics(topicsList);
 
@@ -164,7 +167,14 @@ export const AuthorsTab = () => {
                   selected={selectedTopicId === topic.id}
                   onClick={() => handleListItemClick(topic.id)}
                 >
-                  <ListItemText primary={topic.label} />
+                  <ListItemText
+                    primary={topic.label}
+                    secondary={
+                      topic.worksCount > 1
+                        ? `(${topic.worksCount.toLocaleString()} works)`
+                        : `(${topic.worksCount.toLocaleString()} work)`
+                    }
+                  />
                 </ListItemButton>
               ))}
             </List>

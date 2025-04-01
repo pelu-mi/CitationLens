@@ -1,6 +1,7 @@
 // ForceDirectedGraph.jsx
 import { useRef, useEffect } from "react";
 import * as d3 from "d3";
+import { assignRGBColor } from "../../utils/assignRGBColo";
 
 export const ForceDirectedGraph = ({ works }) => {
   const svgRef = useRef(null);
@@ -24,6 +25,7 @@ export const ForceDirectedGraph = ({ works }) => {
       title: work.title || "Untitled work", // Provide default for missing titles
       year: work.publication_year,
       citations: work.cited_by_count,
+      type: work.type, // Use work type for node coloring
     }));
 
     // Create links only for referenced works that exist in our 200 fetched works
@@ -31,7 +33,7 @@ export const ForceDirectedGraph = ({ works }) => {
     works.forEach((work) => {
       if (work.referenced_works) {
         work.referenced_works.forEach((referencedId) => {
-          if (worksMap.has(referencedId)) {
+          if (worksMap.has(referencedId) && referencedId !== work.id) {
             links.push({
               source: work.id,
               target: referencedId,
@@ -113,12 +115,9 @@ export const ForceDirectedGraph = ({ works }) => {
           .id((d) => d.id)
           .distance(100)
       )
-      .force("charge", d3.forceManyBody().strength(-150)) // Reduced strength to make the graph more compact
+      .force("charge", d3.forceManyBody().strength(-20)) // Reduced trength to make the graph more compact
       .force("center", d3.forceCenter(0, 0))
-      .force(
-        "collide",
-        d3.forceCollide().radius((d) => Math.sqrt(d.citations / 10 || 1) + 1)
-      );
+      .force("collide", d3.forceCollide().radius(40));
 
     // Add nodes
     const node = g
@@ -131,26 +130,13 @@ export const ForceDirectedGraph = ({ works }) => {
     // Node circles
     node
       .append("circle")
-      .attr("r", (d) => Math.sqrt(d.citations / 10 || 1) + 1)
-      .attr("fill", (d) => d3.interpolateBlues((d.year || 2010) / 2025))
+      .attr("r", 13)
+      .attr("fill", (d) => {
+        let rgb = assignRGBColor(d.type);
+        return `rgb(${rgb.join(",")})`;
+      })
       .attr("stroke", "#fff")
       .attr("stroke-width", 1.5);
-
-    // Node titles
-    node.append("title").text((d) => d.title);
-
-    // Optional: Add text labels for the most cited papers
-    node
-      .filter((d) => d.citations > 100) // Adjust threshold as needed
-      .append("text")
-      .attr("x", 8)
-      .attr("y", "0.31em")
-      .text((d) => {
-        // Safe substring operation with null check
-        return d.title ? d.title.substring(0, 20) + "..." : "Untitled";
-      })
-      .attr("font-size", "10px")
-      .attr("fill", "#333");
 
     // Fit view function to calculate appropriate zoom level
     const fitView = () => {
@@ -189,7 +175,7 @@ export const ForceDirectedGraph = ({ works }) => {
       // Apply the transformation
       svg
         .transition()
-        .duration(750)
+        .duration(200)
         .call(
           zoom.transform,
           d3.zoomIdentity.translate(translateX, translateY).scale(scale)
@@ -202,11 +188,7 @@ export const ForceDirectedGraph = ({ works }) => {
       node.attr("transform", (d) => `translate(${d.x},${d.y})`);
     });
 
-    // Call fitView once simulation has stabilized a bit
-    simulation.on("end", fitView);
-
-    // Also execute fitView after a timeout in case simulation doesn't end
-    setTimeout(fitView, 1000);
+    fitView();
 
     // Drag functionality
     function drag(simulation) {
@@ -315,14 +297,6 @@ export const ForceDirectedGraph = ({ works }) => {
   return (
     <div ref={containerRef} className="force-directed-graph">
       <svg ref={svgRef} />
-      <div className="graph-legend">
-        <p>• Node size indicates citation count</p>
-        <p>• Node color indicates publication year (darker = more recent)</p>
-        <p>• Arrows point from the citing work to the cited work</p>
-        <p>
-          • Use mouse wheel to zoom, drag to pan, and drag nodes to reposition
-        </p>
-      </div>
     </div>
   );
 };
