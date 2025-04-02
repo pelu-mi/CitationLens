@@ -107,11 +107,13 @@ export const ForceDirectedGraph = ({ works }) => {
       `;
     }
 
-    // Add arrow markers for directed edges
-    svg
-      .append("defs")
+    // Add arrow markers for directed edges with different colors
+    const defs = svg.append("defs");
+
+    // Default arrow marker
+    defs
       .append("marker")
-      .attr("id", "arrow")
+      .attr("id", "arrow-default")
       .attr("viewBox", "0 -5 10 10")
       .attr("refX", 25)
       .attr("refY", -1)
@@ -120,6 +122,34 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("orient", "auto")
       .append("path")
       .attr("fill", "#999")
+      .attr("d", "M0,-5L10,0L0,5");
+
+    // Outgoing arrow marker (blue)
+    defs
+      .append("marker")
+      .attr("id", "arrow-outgoing")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 20) // Adjusted position
+      .attr("refY", -1)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("fill", "#007bff")
+      .attr("d", "M0,-5L10,0L0,5");
+
+    // Incoming arrow marker (green)
+    defs
+      .append("marker")
+      .attr("id", "arrow-incoming")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 20) // Adjusted position
+      .attr("refY", -1)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("fill", "#28a745")
       .attr("d", "M0,-5L10,0L0,5");
 
     // Add links with curved paths
@@ -132,7 +162,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("stroke-opacity", 0.6)
       .attr("stroke-width", 1.5)
       .attr("fill", "none")
-      .attr("marker-end", "url(#arrow)")
+      .attr("marker-end", "url(#arrow-default)")
       .attr("data-source", (d) => d.source.id || d.source)
       .attr("data-target", (d) => d.target.id || d.target);
 
@@ -152,7 +182,12 @@ export const ForceDirectedGraph = ({ works }) => {
 
     // Function to find neighbor nodes
     function findNeighbors(nodeId) {
-      const neighbors = new Set();
+      const neighbors = {
+        outgoing: new Set(),
+        incoming: new Set(),
+        all: new Set(),
+      };
+
       links.forEach((link) => {
         const sourceId =
           typeof link.source === "object" ? link.source.id : link.source;
@@ -160,39 +195,57 @@ export const ForceDirectedGraph = ({ works }) => {
           typeof link.target === "object" ? link.target.id : link.target;
 
         if (sourceId === nodeId) {
-          neighbors.add(targetId);
+          neighbors.outgoing.add(targetId);
+          neighbors.all.add(targetId);
         } else if (targetId === nodeId) {
-          neighbors.add(sourceId);
+          neighbors.incoming.add(sourceId);
+          neighbors.all.add(sourceId);
         }
       });
+
       return neighbors;
     }
 
-    // Function to highlight a node and its connections
+    // Function to highlight a node and its connections with different colors for incoming/outgoing
     function highlightConnections(d, opacity = 1) {
       const neighbors = findNeighbors(d.id);
 
       // Dim all nodes and links
       node.style("opacity", 0.2);
-      link.style("opacity", 0.1);
+      link.style("opacity", 0.1).attr("marker-end", "url(#arrow-default)");
 
       // Highlight hovered node and its neighbors
       node
-        .filter((n) => n.id === d.id || neighbors.has(n.id))
+        .filter((n) => n.id === d.id || neighbors.all.has(n.id))
         .style("opacity", opacity);
 
-      // Highlight connected links
+      // Highlight outgoing links (blue)
       link
         .filter((l) => {
           const sourceId =
             typeof l.source === "object" ? l.source.id : l.source;
           const targetId =
             typeof l.target === "object" ? l.target.id : l.target;
-          return sourceId === d.id || targetId === d.id;
+          return sourceId === d.id;
         })
         .style("opacity", opacity)
         .style("stroke", "#007bff")
-        .style("stroke-width", 2);
+        .style("stroke-width", 2)
+        .attr("marker-end", "url(#arrow-outgoing)");
+
+      // Highlight incoming links (green)
+      link
+        .filter((l) => {
+          const sourceId =
+            typeof l.source === "object" ? l.source.id : l.source;
+          const targetId =
+            typeof l.target === "object" ? l.target.id : l.target;
+          return targetId === d.id;
+        })
+        .style("opacity", opacity)
+        .style("stroke", "#28a745")
+        .style("stroke-width", 2)
+        .attr("marker-end", "url(#arrow-incoming)");
     }
 
     // Function to reset highlighting
@@ -201,7 +254,8 @@ export const ForceDirectedGraph = ({ works }) => {
       link
         .style("opacity", 0.6)
         .style("stroke", "#999")
-        .style("stroke-width", 1.5);
+        .style("stroke-width", 1.5)
+        .attr("marker-end", "url(#arrow-default)");
     }
 
     // Function to update tooltip position based on the active node element
@@ -284,13 +338,24 @@ export const ForceDirectedGraph = ({ works }) => {
       activeNodeRef.current = d;
       activeNodeElementRef.current = nodeElement;
 
-      // Update tooltip content
+      // Get neighbor counts
+      const neighbors = findNeighbors(d.id);
+
+      // Update tooltip content with incoming/outgoing counts
       tooltip.html(`
         <strong>${d.title}</strong><br>
         Year: ${d.year || "N/A"}<br>
         Citations: ${d.citations}<br>
         References: ${d.referencesCount}<br>
-        Type: ${d.type}
+        Type: ${d.type}<br>
+        <div style="margin-top: 5px;">
+          <span style="color: #007bff;">◆ Outgoing: ${
+            neighbors.outgoing.size
+          }</span><br>
+          <span style="color: #28a745;">◆ Incoming: ${
+            neighbors.incoming.size
+          }</span>
+        </div>
       `);
 
       // Make tooltip visible first with zero opacity
@@ -545,6 +610,46 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("text-anchor", "middle")
       .attr("pointer-events", "none")
       .text("⟲");
+
+    // Add a legend for edge types
+    const legend = svg
+      .append("g")
+      .attr("transform", `translate(20, ${height - 60})`)
+      .attr("class", "edge-legend");
+
+    // Outgoing edge
+    legend
+      .append("line")
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", 30)
+      .attr("y2", 0)
+      .attr("stroke", "#007bff")
+      .attr("stroke-width", 2);
+
+    legend
+      .append("text")
+      .attr("x", 35)
+      .attr("y", 4)
+      .text("Outgoing connections")
+      .attr("font-size", "10px");
+
+    // Incoming edge
+    legend
+      .append("line")
+      .attr("x1", 0)
+      .attr("y1", 20)
+      .attr("x2", 30)
+      .attr("y2", 20)
+      .attr("stroke", "#28a745")
+      .attr("stroke-width", 2);
+
+    legend
+      .append("text")
+      .attr("x", 35)
+      .attr("y", 24)
+      .text("Incoming connections")
+      .attr("font-size", "10px");
 
     return () => {
       simulation.stop();
