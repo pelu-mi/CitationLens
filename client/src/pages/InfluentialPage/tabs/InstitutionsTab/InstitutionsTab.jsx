@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 
-export const TopicsTab = () => {
+export const InstitutionsTab = () => {
   return (
     <>
       <Typography
@@ -12,7 +12,7 @@ export const TopicsTab = () => {
           textTransform: "capitalize",
         }}
       >
-        Topics
+        Institutions
       </Typography>
     </>
   );

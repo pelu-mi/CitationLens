@@ -1,13 +1,13 @@
 import { Divider, Typography } from "@mui/material";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import SellIcon from "@mui/icons-material/Sell";
 import FaceIcon from "@mui/icons-material/Face";
 import ArticleIcon from "@mui/icons-material/Article";
+import ApartmentIcon from "@mui/icons-material/Apartment";
 import { InfluBreadcrumbs } from "./units/InfluBreadcrumbs/InfluBreadcrumbs";
 import { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
-import { TopicsTab } from "./tabs/TopicsTab/TopicsTab";
+import { InstitutionsTab } from "./tabs/InstitutionsTab/InstitutionsTab";
 import { WorksTab } from "./tabs/WorksTab/WorksTab";
 import { AuthorsTab } from "./tabs/AuthorsTab/AuthorsTab";
 
@@ -44,7 +44,7 @@ export const InfluentialPage = () => {
       case 2:
         return <WorksTab />;
       default:
-        return <TopicsTab />;
+        return <InstitutionsTab />;
     }
   };
 
@@ -65,10 +65,10 @@ export const InfluentialPage = () => {
       {/* Tabs */}
       <Tabs value={tabValue} aria-label="influential tabs" centered>
         <Tab
-          icon={<SellIcon />}
+          icon={<ApartmentIcon />}
           iconPosition="start"
-          label="Topics"
-          onClick={() => handleClickTab("topics")}
+          label="Institutions"
+          onClick={() => handleClickTab("institutions")}
         />
         <Tab
           icon={<FaceIcon />}
