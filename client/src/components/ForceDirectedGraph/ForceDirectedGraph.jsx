@@ -129,7 +129,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .append("marker")
       .attr("id", "arrow-outgoing")
       .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 20) // Adjusted position
+      .attr("refX", 20)
       .attr("refY", -1)
       .attr("markerWidth", 6)
       .attr("markerHeight", 6)
@@ -143,7 +143,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .append("marker")
       .attr("id", "arrow-incoming")
       .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 20) // Adjusted position
+      .attr("refX", 20)
       .attr("refY", -1)
       .attr("markerWidth", 6)
       .attr("markerHeight", 6)
