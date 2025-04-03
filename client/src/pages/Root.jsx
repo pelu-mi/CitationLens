@@ -5,17 +5,29 @@ import { PageLayout } from "../components/PageLayout/PageLayout";
 
 export const Root = () => {
   return (
-    <PageLayout>
-      <Routes>
-        <Route path="/" element={<HomePage />}>
-          <Route path="*" />
-          <Route path=":domainId" />
-        </Route>
-        <Route path="/influential" element={<InfluentialPage />}>
-          <Route path=":subfieldId/" />
-          <Route path=":subfieldId/:tabName" />
-        </Route>
-      </Routes>
-    </PageLayout>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <PageLayout>
+            <HomePage />
+          </PageLayout>
+        }
+      >
+        <Route path="*" />
+        <Route path=":domainId" />
+      </Route>
+      <Route
+        path="/influential"
+        element={
+          <PageLayout disableFullHeight>
+            <InfluentialPage />
+          </PageLayout>
+        }
+      >
+        <Route path=":subfieldId/" />
+        <Route path=":subfieldId/:tabName" />
+      </Route>
+    </Routes>
   );
 };

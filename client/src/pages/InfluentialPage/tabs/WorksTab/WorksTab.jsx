@@ -40,20 +40,25 @@ export const WorksTab = () => {
     fetchWorks();
   }, [subfieldId]);
 
-  if (loading) {
-    return <Loader />;
-  }
-
   if (error) {
     return <div>Error: {error}</div>;
   }
 
   return (
-    <div>
-      {works.length === 0 ? (
-        <div>No works found for this subfield</div>
+    <div
+      style={{
+        width: "100%",
+        height: "calc(100vh - 280px)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {loading || works.length === 0 ? (
+        <Loader />
       ) : (
-        <ForceDirectedGraph works={works} />
+        <div style={{ flex: 1, overflow: "hidden" }}>
+          <ForceDirectedGraph works={works} />
+        </div>
       )}
     </div>
   );

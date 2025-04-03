@@ -1,4 +1,3 @@
-// ForceDirectedGraph.jsx
 import { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { assignRGBColor } from "../../utils/assignRGBColor";
@@ -7,11 +6,38 @@ export const ForceDirectedGraph = ({ works }) => {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const tooltipRef = useRef(null);
-  const activeNodeRef = useRef(null); // Keep track of the currently active node
-  const activeNodeElementRef = useRef(null); // Keep track of the DOM element for the active node
+  const activeNodeRef = useRef(null);
+  const activeNodeElementRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  // Resize observer to update graph dimensions
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        setDimensions({ width, height });
+      }
+    });
+
+    // Start observing the container
+    resizeObserver.observe(containerRef.current);
+
+    // Clean up
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
-    if (!works.length || !svgRef.current) return;
+    if (
+      !works.length ||
+      !svgRef.current ||
+      !dimensions.width ||
+      !dimensions.height
+    )
+      return;
 
     // Clear any previous SVG content
     d3.select(svgRef.current).selectAll("*").remove();
@@ -25,10 +51,10 @@ export const ForceDirectedGraph = ({ works }) => {
     // Create nodes and links for the graph
     const nodes = works.map((work) => ({
       id: work.id,
-      title: work.title || "Untitled work", // Provide default for missing titles
+      title: work.title || "Untitled work",
       year: work.publication_year,
       citations: work.cited_by_count,
-      type: work.type, // Use work type for node coloring
+      type: work.type,
       referencesCount: work.referenced_works ? work.referenced_works.length : 0,
     }));
 
@@ -48,17 +74,17 @@ export const ForceDirectedGraph = ({ works }) => {
       }
     });
 
-    // Set up dimensions
-    const width = 928;
-    const height = 450;
+    // Use actual dimensions from state
+    const width = dimensions.width;
+    const height = dimensions.height;
 
     // Create SVG element
     const svg = d3
       .select(svgRef.current)
       .attr("viewBox", [0, 0, width, height])
-      .attr("width", "100%")
+      .attr("width", width)
       .attr("height", height)
-      .attr("style", "max-width: 100%; height: auto; font: 12px sans-serif;");
+      .attr("style", "width: 100%; height: 100%;");
 
     // Create tooltip div
     const tooltip = d3
@@ -76,7 +102,9 @@ export const ForceDirectedGraph = ({ works }) => {
       .style("z-index", "10")
       .style("max-width", "300px")
       .style("opacity", 0)
-      .style("transition", "opacity 300ms");
+      .style("transition", "opacity 300ms")
+      .style("top", "0")
+      .style("left", "0");
 
     tooltipRef.current = tooltip.node();
 
@@ -86,7 +114,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Define zoom behavior
     const zoom = d3
       .zoom()
-      .scaleExtent([0.1, 8]) // Allow zooming out further
+      .scaleExtent([0.1, 8])
       .on("zoom", (event) => {
         g.attr("transform", event.transform);
 
@@ -176,8 +204,8 @@ export const ForceDirectedGraph = ({ works }) => {
           .id((d) => d.id)
           .distance(100)
       )
-      .force("charge", d3.forceManyBody().strength(-20)) // Reduced strength to make the graph more compact
-      .force("center", d3.forceCenter(width / 2, height / 2)) // Center the graph in the SVG
+      .force("charge", d3.forceManyBody().strength(-20))
+      .force("center", d3.forceCenter(width / 2, height / 2))
       .force("collide", d3.forceCollide().radius(40));
 
     // Function to find neighbor nodes
@@ -341,21 +369,15 @@ export const ForceDirectedGraph = ({ works }) => {
       // Get neighbor counts
       const neighbors = findNeighbors(d.id);
 
+      const [r, g, b] = assignRGBColor(d.type);
+
       // Update tooltip content with incoming/outgoing counts
       tooltip.html(`
         <strong>${d.title}</strong><br>
+        Type: <span style="text-transform: capitalize;">${d.type}</span><br>
         Year: ${d.year || "N/A"}<br>
-        Citations: ${d.citations}<br>
         References: ${d.referencesCount}<br>
-        Type: ${d.type}<br>
-        <div style="margin-top: 5px;">
-          <span style="color: #007bff;">◆ Outgoing: ${
-            neighbors.outgoing.size
-          }</span><br>
-          <span style="color: #28a745;">◆ Incoming: ${
-            neighbors.incoming.size
-          }</span>
-        </div>
+        Citation Count: ${d.citations}<br>
       `);
 
       // Make tooltip visible first with zero opacity
@@ -399,7 +421,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .call(drag(simulation))
       .attr("data-id", (d) => d.id)
       .attr("class", "node-group")
-      .style("position", "relative"); // Set position relative for each node
+      .style("position", "relative");
 
     // Node circles
     node
@@ -533,10 +555,10 @@ export const ForceDirectedGraph = ({ works }) => {
         .on("end", dragended);
     }
 
-    // Add zoom controls
+    // Position zoom controls with regard to width
     const zoomControls = svg
       .append("g")
-      .attr("transform", `translate(${width - 80}, 30)`)
+      .attr("transform", `translate(${width - 35}, 20)`)
       .attr("class", "zoom-controls");
 
     // Zoom in button
@@ -546,12 +568,12 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("y", 0)
       .attr("width", 30)
       .attr("height", 30)
-      .attr("fill", "#f0f0f0")
-      .attr("stroke", "#999")
+      .attr("fill", "#fefefe")
+      .attr("stroke", "#ccc")
       .attr("rx", 5)
       .attr("cursor", "pointer")
       .on("click", (event) => {
-        event.stopPropagation(); // Prevent triggering the SVG click handler
+        event.stopPropagation();
         svg.transition().duration(300).call(zoom.scaleBy, 1.3);
       });
 
@@ -570,12 +592,12 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("y", 40)
       .attr("width", 30)
       .attr("height", 30)
-      .attr("fill", "#f0f0f0")
-      .attr("stroke", "#999")
+      .attr("fill", "#fefefe")
+      .attr("stroke", "#ccc")
       .attr("rx", 5)
       .attr("cursor", "pointer")
       .on("click", (event) => {
-        event.stopPropagation(); // Prevent triggering the SVG click handler
+        event.stopPropagation();
         svg.transition().duration(300).call(zoom.scaleBy, 0.7);
       });
 
@@ -594,12 +616,12 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("y", 80)
       .attr("width", 30)
       .attr("height", 30)
-      .attr("fill", "#f0f0f0")
-      .attr("stroke", "#999")
+      .attr("fill", "#fefefe")
+      .attr("stroke", "#ccc")
       .attr("rx", 5)
       .attr("cursor", "pointer")
       .on("click", (event) => {
-        event.stopPropagation(); // Prevent triggering the SVG click handler
+        event.stopPropagation();
         fitView();
       });
 
@@ -612,13 +634,21 @@ export const ForceDirectedGraph = ({ works }) => {
       .text("⟲");
 
     // Add a legend for edge types
-    const legend = svg
+    const edgeLegend = svg
       .append("g")
-      .attr("transform", `translate(20, ${height - 60})`)
+      .attr("transform", `translate(5, ${height - 50})`)
       .attr("class", "edge-legend");
 
+    edgeLegend
+      .append("text")
+      .attr("x", 0)
+      .attr("y", -18)
+      .attr("font-weight", "bold")
+      .attr("font-size", "12px")
+      .text("Connection Types");
+
     // Outgoing edge
-    legend
+    edgeLegend
       .append("line")
       .attr("x1", 0)
       .attr("y1", 0)
@@ -627,15 +657,15 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("stroke", "#007bff")
       .attr("stroke-width", 2);
 
-    legend
+    edgeLegend
       .append("text")
       .attr("x", 35)
       .attr("y", 4)
-      .text("Outgoing connections")
+      .text("Reference")
       .attr("font-size", "10px");
 
     // Incoming edge
-    legend
+    edgeLegend
       .append("line")
       .attr("x1", 0)
       .attr("y1", 20)
@@ -644,25 +674,94 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("stroke", "#28a745")
       .attr("stroke-width", 2);
 
-    legend
+    edgeLegend
       .append("text")
       .attr("x", 35)
       .attr("y", 24)
-      .text("Incoming connections")
+      .text("Citation")
       .attr("font-size", "10px");
 
+    // Add node type color legend
+    const typeLegend = svg
+      .append("g")
+      .attr("transform", `translate(5, 40)`)
+      .attr("class", "type-legend");
+
+    // Title for the type legend
+    typeLegend
+      .append("text")
+      .attr("x", 0)
+      .attr("y", -10)
+      .attr("font-weight", "bold")
+      .attr("font-size", "12px")
+      .text("Work Types");
+
+    // Define the document types from assignRGBColor
+    const documentTypes = [
+      { type: "article", label: "Article" },
+      { type: "book", label: "Book / Book Chapter" },
+      { type: "dataset", label: "Dataset" },
+      { type: "preprint", label: "Preprint" },
+      { type: "dissertation", label: "Dissertation" },
+      { type: "others", label: "Others" },
+    ];
+
+    // Create legend entries for each document type
+    documentTypes.forEach((item, i) => {
+      const y = i * 20;
+      const rgb = assignRGBColor(item.type);
+
+      // Color circle
+      typeLegend
+        .append("circle")
+        .attr("cx", 10)
+        .attr("cy", y + 10)
+        .attr("r", 8)
+        .attr("fill", `rgb(${rgb.join(",")})`)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1);
+
+      // Type label
+      typeLegend
+        .append("text")
+        .attr("x", 25)
+        .attr("y", y + 14)
+        .attr("font-size", "10px")
+        .text(item.label);
+    });
+
+    // Automatically resize handling
+    window.addEventListener("resize", fitView);
+
     return () => {
+      1;
       simulation.stop();
+      window.removeEventListener("resize", fitView);
       // Remove tooltip when component unmounts
       if (tooltipRef.current && tooltipRef.current.parentNode) {
         tooltipRef.current.parentNode.removeChild(tooltipRef.current);
       }
     };
-  }, [works]);
+  }, [works, dimensions]);
 
   return (
-    <div ref={containerRef} className="force-directed-graph">
-      <svg ref={svgRef} />
+    <div
+      ref={containerRef}
+      className="force-directed-graph-container"
+      style={{
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+      }}
+    >
+      <svg
+        ref={svgRef}
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "block",
+        }}
+      />
     </div>
   );
 };

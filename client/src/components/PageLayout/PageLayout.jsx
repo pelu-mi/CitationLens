@@ -9,19 +9,21 @@ import { NavBar } from "../NavBar/NavBar";
 /**
  * Page Layout
  */
-export const PageLayout = ({ children }) => {
+export const PageLayout = ({ children, disableFullHeight }) => {
   return (
     <>
-      <GlobalStyles
-        styles={css`
-          html,
-          body,
-          #root {
-            height: 100%;
-            overflow-x: hidden;
-          }
-        `}
-      />
+      {!disableFullHeight && (
+        <GlobalStyles
+          styles={css`
+            html,
+            body,
+            #root {
+              height: 100%;
+              overflow-x: hidden;
+            }
+          `}
+        />
+      )}
 
       <NavBar />
       <Container sx={{ paddingTop: "64px", height: "100%" }}>
