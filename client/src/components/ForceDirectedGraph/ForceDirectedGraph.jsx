@@ -734,7 +734,6 @@ export const ForceDirectedGraph = ({ works }) => {
     window.addEventListener("resize", fitView);
 
     return () => {
-      1;
       simulation.stop();
       window.removeEventListener("resize", fitView);
       // Remove tooltip when component unmounts
