@@ -1,7 +1,7 @@
 // ForceDirectedGraph.jsx
 import { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
-import { assignRGBColor } from "../../utils/assignRGBColo";
+import { assignRGBColor } from "../../utils/assignRGBColor";
 
 export const ForceDirectedGraph = ({ works }) => {
   const svgRef = useRef(null);
