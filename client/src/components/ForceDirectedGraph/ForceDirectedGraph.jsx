@@ -1,6 +1,10 @@
 import { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { assignRGBColor } from "../../utils/assignRGBColor";
+import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import { createRoot } from "react-dom/client";
 
 export const ForceDirectedGraph = ({ works }) => {
   const svgRef = useRef(null);
@@ -559,83 +563,83 @@ export const ForceDirectedGraph = ({ works }) => {
         .on("end", dragended);
     }
 
-    // Position zoom controls with regard to width
+    // Create foreign objects for Material-UI icons in zoom controls
     const zoomControls = svg
       .append("g")
-      .attr("transform", `translate(${width - 35}, 20)`)
+      .attr("transform", `translate(${width - 40}, 20)`)
       .attr("class", "zoom-controls");
 
-    // Zoom in button
-    zoomControls
-      .append("rect")
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("width", 30)
-      .attr("height", 30)
-      .attr("fill", "#fefefe")
-      .attr("stroke", "#ccc")
-      .attr("rx", 5)
-      .attr("cursor", "pointer")
-      .on("click", (event) => {
+    // Helper function to create a control button with Material-UI icon
+    function createControlButton(y, onClick, IconComponent, label) {
+      // Create a foreign object to host the React component
+      const foreignObject = zoomControls
+        .append("foreignObject")
+        .attr("x", 0)
+        .attr("y", y)
+        .attr("width", 36)
+        .attr("height", 36)
+        .attr("cursor", "pointer");
+
+      // Create a div element inside the foreignObject
+      const div = document.createElement("div");
+      div.style.width = "36px";
+      div.style.height = "36px";
+      div.style.backgroundColor = "#fefefe";
+      div.style.border = "1px solid #ccc";
+      div.style.borderRadius = "5px";
+      div.style.display = "flex";
+      div.style.justifyContent = "center";
+      div.style.alignItems = "center";
+      div.style.cursor = "pointer";
+      div.title = label;
+
+      // Append the div to the foreignObject
+      foreignObject.node().appendChild(div);
+
+      // Create a React root and render the icon
+      const root = createRoot(div);
+      root.render(
+        <IconComponent style={{ fontSize: "20px", color: "#555" }} />
+      );
+
+      // Add click event listener
+      div.addEventListener("click", (event) => {
         event.stopPropagation();
+        onClick();
+      });
+
+      return foreignObject;
+    }
+
+    // Zoom in button with ZoomInIcon
+    createControlButton(
+      0,
+      () => {
         svg.transition().duration(300).call(zoom.scaleBy, 1.3);
-      });
+      },
+      AddIcon,
+      "Zoom In"
+    );
 
-    zoomControls
-      .append("text")
-      .attr("x", 15)
-      .attr("y", 20)
-      .attr("text-anchor", "middle")
-      .attr("pointer-events", "none")
-      .text("+");
-
-    // Zoom out button
-    zoomControls
-      .append("rect")
-      .attr("x", 0)
-      .attr("y", 40)
-      .attr("width", 30)
-      .attr("height", 30)
-      .attr("fill", "#fefefe")
-      .attr("stroke", "#ccc")
-      .attr("rx", 5)
-      .attr("cursor", "pointer")
-      .on("click", (event) => {
-        event.stopPropagation();
+    // Zoom out button with ZoomOutIcon
+    createControlButton(
+      45,
+      () => {
         svg.transition().duration(300).call(zoom.scaleBy, 0.7);
-      });
+      },
+      RemoveIcon,
+      "Zoom Out"
+    );
 
-    zoomControls
-      .append("text")
-      .attr("x", 15)
-      .attr("y", 60)
-      .attr("text-anchor", "middle")
-      .attr("pointer-events", "none")
-      .text("−");
-
-    // Reset/Fit view button
-    zoomControls
-      .append("rect")
-      .attr("x", 0)
-      .attr("y", 80)
-      .attr("width", 30)
-      .attr("height", 30)
-      .attr("fill", "#fefefe")
-      .attr("stroke", "#ccc")
-      .attr("rx", 5)
-      .attr("cursor", "pointer")
-      .on("click", (event) => {
-        event.stopPropagation();
+    // Reset/Fit view button with CenterFocusStrongIcon
+    createControlButton(
+      90,
+      () => {
         fitView();
-      });
-
-    zoomControls
-      .append("text")
-      .attr("x", 15)
-      .attr("y", 100)
-      .attr("text-anchor", "middle")
-      .attr("pointer-events", "none")
-      .text("⟲");
+      },
+      CenterFocusStrongIcon,
+      "Fit View"
+    );
 
     // Add a legend for edge types
     const edgeLegend = svg
