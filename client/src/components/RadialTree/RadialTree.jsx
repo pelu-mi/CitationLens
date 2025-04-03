@@ -102,6 +102,10 @@ export const RadialTree = ({ data }) => {
     const zoom = d3
       .zoom()
       .scaleExtent([1, 10]) // Limit zoom levels
+      .filter((event) => {
+        // Disable double-click zoom behavior
+        return !event.type.includes("dblclick");
+      })
       .on("zoom", (event) => {
         container.attr("transform", event.transform);
       });

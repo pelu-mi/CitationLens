@@ -115,6 +115,10 @@ export const ForceDirectedGraph = ({ works }) => {
     const zoom = d3
       .zoom()
       .scaleExtent([0.1, 8])
+      .filter((event) => {
+        // Disable double-click zoom behavior
+        return !event.type.includes("dblclick");
+      })
       .on("zoom", (event) => {
         g.attr("transform", event.transform);
 
