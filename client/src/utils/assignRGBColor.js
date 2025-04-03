@@ -1,13 +1,13 @@
 export function assignRGBColor(workType) {
   // Define HSB color values for each work type
   const colorMap = {
-    article: [0, 1, 0.9], // Article: Red
-    book: [240, 1, 0.95], // Book: Blue
-    "book-chapter": [240, 1, 0.95], // Book Chapter: Blue
-    dataset: [120, 1, 0.8], // Dataset: Green
+    article: [350, 0.8, 0.9], // Article: Red
+    book: [225, 0.8, 0.85], // Book: Blue
+    "book-chapter": [225, 0.8, 0.85], // Book Chapter: Blue
+    dataset: [160, 0.8, 0.75], // Dataset: Green
     preprint: [44, 1, 1], // Preprint: Yellow
-    dissertation: [182, 1, 1], // Dissertation: Aqua
-    others: [1, 0, 0.3], // Other categories: Grey
+    dissertation: [195, 0.75, 0.9], // Dissertation: Aqua
+    others: [0, 0, 0.55], // Other categories: Grey
   };
 
   // Get the appropriate HSB values
