@@ -4,6 +4,7 @@ import { useLocation, useParams } from "react-router";
 import { Loader } from "../../../../components/Loader/Loader";
 import { openAlexApiClient } from "../../../../services/openAlexApiClient";
 import { TopicSelector } from "../../../../components/TopicSelector/TopicSelector";
+import { InstitutionsBarChart } from "../../../../components/InstitutionsBarChart/InstitutionsBarChart";
 
 export const InstitutionsTab = () => {
   const { subfieldId } = useParams();
@@ -67,9 +68,7 @@ export const InstitutionsTab = () => {
 
       <Grid2
         size={9}
-        paddingX={4}
-        paddingBottom={3}
-        paddingTop={6}
+        padding={2}
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -78,7 +77,7 @@ export const InstitutionsTab = () => {
         {loading || institutions.length === 0 ? (
           <Loader />
         ) : (
-          <h4>Bar Chart here</h4>
+          <InstitutionsBarChart data={institutions} />
         )}
       </Grid2>
     </Grid2>
