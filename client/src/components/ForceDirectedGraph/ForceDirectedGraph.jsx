@@ -384,8 +384,8 @@ export const ForceDirectedGraph = ({ works }) => {
         <strong>${d.title}</strong><br>
         Type: <span style="text-transform: capitalize;">${d.type}</span><br>
         Year: ${d.year || "N/A"}<br>
-        References: ${d.referencesCount}<br>
-        Citation Count: ${d.citations}<br>
+        References: ${d.referencesCount.toLocaleString()}<br>
+        Citation Count: ${d.citations.toLocaleString()}<br>
       `);
 
       // Make tooltip visible first with zero opacity

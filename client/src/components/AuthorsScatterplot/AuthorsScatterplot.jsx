@@ -88,8 +88,8 @@ export const AuthorsScatterplot = ({ authors, width = 700, height = 500 }) => {
         tooltip.html(
           `
           <strong>${d.display_name}</strong><br/>
-          Works: ${d.works_count}<br/>
-          Citations: ${d.cited_by_count}
+          Works: ${d.works_count.toLocaleString()}<br/>
+          Citations: ${d.cited_by_count.toLocaleString()}
         `
         );
 
