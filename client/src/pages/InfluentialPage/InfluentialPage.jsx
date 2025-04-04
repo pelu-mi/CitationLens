@@ -29,9 +29,18 @@ export const InfluentialPage = () => {
   } = useLocation();
   const [tabValue, setTabValue] = useState(getTabValue(tabName));
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const topicParam = searchParams.get("topic");
 
-  const handleClickTab = (tabName) => {
-    navigate(`/influential/${subfieldId}/${tabName}`, {
+  const handleClickTab = (tabName, param) => {
+    let destination = `/influential/${subfieldId}/${tabName}`;
+
+    if (param) {
+      destination += `?topic=${param}`;
+    }
+
+    navigate(destination, {
       state: { subfieldName },
     });
     setTabValue(getTabValue(tabName));
@@ -68,13 +77,13 @@ export const InfluentialPage = () => {
           icon={<ApartmentIcon />}
           iconPosition="start"
           label="Institutions"
-          onClick={() => handleClickTab("institutions")}
+          onClick={() => handleClickTab("institutions", topicParam || null)}
         />
         <Tab
           icon={<FaceIcon />}
           iconPosition="start"
           label="Authors"
-          onClick={() => handleClickTab("authors")}
+          onClick={() => handleClickTab("authors", topicParam || null)}
         />
         <Tab
           icon={<ArticleIcon />}
