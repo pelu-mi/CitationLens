@@ -68,7 +68,8 @@ export const InstitutionsTab = () => {
 
       <Grid2
         size={9}
-        padding={2}
+        paddingX={2}
+        paddingTop={2}
         display="flex"
         justifyContent="center"
         alignItems="center"
