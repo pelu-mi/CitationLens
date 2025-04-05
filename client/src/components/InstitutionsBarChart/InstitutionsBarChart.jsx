@@ -71,12 +71,14 @@ export const InstitutionsBarChart = ({ data }) => {
       .attr("class", "d3-tooltip")
       .style("opacity", 0)
       .style("position", "absolute")
-      .style("background-color", "rgba(0, 0, 0, 0.8)")
-      .style("color", "white")
-      .style("padding", "8px")
-      .style("border-radius", "4px")
+      .style("background-color", "white")
+      .style("border", "1px solid #ddd")
+      .style("border-radius", "5px")
+      .style("padding", "10px")
+      .style("box-shadow", "0 2px 5px rgba(0,0,0,0.2)")
       .style("pointer-events", "none")
-      .style("z-index", 100);
+      .style("z-index", 100)
+      .style("max-width", "300px");
 
     // Create bars and labels in the scrollable area
     sortedData.forEach((d, i) => {
@@ -112,7 +114,7 @@ export const InstitutionsBarChart = ({ data }) => {
         .on("mouseover", function (event) {
           d3.select(this).transition().duration(200).attr("fill", "#2196f3");
 
-          tooltip.transition().duration(200).style("opacity", 0.9);
+          tooltip.transition().duration(200).style("opacity", 1);
           tooltip
             .html(
               `
