@@ -52,7 +52,7 @@ export const AuthorsTab = () => {
   return (
     <Grid2
       container
-      wrap="no-wrap"
+      wrap="nowrap"
       sx={{
         height: "calc(100vh - 280px)",
       }}
@@ -68,14 +68,19 @@ export const AuthorsTab = () => {
       <Divider orientation="vertical" />
 
       <Grid2
-        size={9}
-        paddingX={4}
+        xs={9}
+        paddingRight={3}
+        paddingLeft={5}
         paddingBottom={3}
-        paddingTop={6}
+        paddingTop={5}
         display="flex"
         justifyContent="center"
         alignItems="center"
-        overflow="auto"
+        flex={1}
+        sx={{
+          height: "100%",
+          overflow: "auto",
+        }}
       >
         {loading || authors.length === 0 ? (
           <Loader />

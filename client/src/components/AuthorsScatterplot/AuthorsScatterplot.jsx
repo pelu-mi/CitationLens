@@ -1,26 +1,53 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-export const AuthorsScatterplot = ({ authors, width = 700, height = 500 }) => {
+export const AuthorsScatterplot = ({ authors }) => {
+  const containerRef = useRef(null);
   const scatterplotRef = useRef(null);
   const tooltipRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  // Set up resize observer to handle container size changes
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (entries[0]) {
+        const { width, height } = entries[0].contentRect;
+        setDimensions({ width, height });
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    // Initial size calculation
+    setDimensions({
+      width: containerRef.current.clientWidth,
+      height: containerRef.current.clientHeight,
+    });
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     // Clear any existing plot
-    if (!authors.length || !scatterplotRef.current) return;
+    if (!authors.length || !scatterplotRef.current || dimensions.width === 0)
+      return;
     d3.select(scatterplotRef.current).selectAll("*").remove();
 
     // Set up dimensions
     const margin = { top: 20, right: 20, bottom: 50, left: 70 };
-    const plotWidth = width - margin.left - margin.right;
-    const plotHeight = height - margin.top - margin.bottom;
+    const plotWidth = dimensions.width - margin.left - margin.right;
+    const plotHeight = dimensions.height - margin.top - margin.bottom;
 
     // Create SVG
     const svg = d3
       .select(scatterplotRef.current)
       .append("svg")
-      .attr("width", width)
-      .attr("height", height)
+      .attr("width", dimensions.width)
+      .attr("height", dimensions.height)
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`)
       .style("position", "relative");
@@ -57,6 +84,7 @@ export const AuthorsScatterplot = ({ authors, width = 700, height = 500 }) => {
       .attr("y", -60)
       .attr("fill", "black")
       .text("Number of Citations");
+
     // Tooltip
     const tooltip = d3.select(tooltipRef.current);
 
@@ -72,6 +100,7 @@ export const AuthorsScatterplot = ({ authors, width = 700, height = 500 }) => {
       .attr("r", 5)
       .attr("fill", "steelblue")
       .attr("opacity", 0.7)
+      .attr("position", "relative")
       .on("mouseover", function (event, d) {
         // Highlight current dot
         d3.selectAll(".dot").transition().duration(200).attr("opacity", 0.2);
@@ -138,15 +167,21 @@ export const AuthorsScatterplot = ({ authors, width = 700, height = 500 }) => {
         // Hide tooltip
         tooltip.transition().duration(200).style("opacity", 0);
       });
-  }, [authors, width, height]);
+  }, [authors, dimensions]);
 
   return (
-    <>
+    <div
+      ref={containerRef}
+      style={{
+        width: "100%",
+        height: "100%",
+      }}
+    >
       <div
         ref={scatterplotRef}
         style={{
-          width: `${width}px`,
-          height: `${height}px`,
+          width: "100%",
+          height: "100%",
         }}
       />
       <div
@@ -166,6 +201,6 @@ export const AuthorsScatterplot = ({ authors, width = 700, height = 500 }) => {
           textOverflow: "ellipsis",
         }}
       />
-    </>
+    </div>
   );
 };
