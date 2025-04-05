@@ -23,7 +23,7 @@ export const RadialTree = ({ data }) => {
       "#7f7f7f", // Gray
       "#bcbd22", // Olive
       "#17becf", // Cyan
-      "#aec7e8", // Light Blue
+      "#8fa9cc", // Light Blue
       "#ffbb78", // Light Orange
       "#98df8a", // Light Green
       "#ff9896", // Light Red
