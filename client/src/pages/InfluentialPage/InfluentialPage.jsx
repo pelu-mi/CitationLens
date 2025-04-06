@@ -89,7 +89,7 @@ export const InfluentialPage = () => {
           icon={<ArticleIcon />}
           iconPosition="start"
           label="Works"
-          onClick={() => handleClickTab("works")}
+          onClick={() => handleClickTab("works", topicParam || null)}
         />
       </Tabs>
       <Divider />

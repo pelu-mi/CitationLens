@@ -1,18 +1,24 @@
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
+import { Divider, Grid2 } from "@mui/material";
+import { useLocation } from "react-router";
 import { openAlexApiClient } from "../../../../services/openAlexApiClient";
 import { Loader } from "../../../../components/Loader/Loader";
 import { ForceDirectedGraph } from "../../../../components/ForceDirectedGraph/ForceDirectedGraph";
+import { TopicSelector } from "../../../../components/TopicSelector/TopicSelector";
 
 export const WorksTab = () => {
   const { subfieldId } = useParams();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [works, setWorks] = useState([]);
   const [error, setError] = useState(null);
+  const [selectedTopicId, setSelectedTopicId] = useState(null);
+  const subfieldName = location.state?.subfieldName;
 
   useEffect(() => {
     const fetchWorks = async () => {
-      if (!subfieldId) return;
+      if (!subfieldId || !selectedTopicId) return;
 
       try {
         setLoading(true);
@@ -20,7 +26,7 @@ export const WorksTab = () => {
 
         const response = await openAlexApiClient.get(`/works`, {
           params: {
-            filter: `primary_topic.subfield.id:${subfieldId}`,
+            filter: `primary_topic.subfield.id:${subfieldId},primary_topic.id:${selectedTopicId}`,
             sort: "cited_by_count:desc",
             per_page: 200,
           },
@@ -38,28 +44,49 @@ export const WorksTab = () => {
     };
 
     fetchWorks();
-  }, [subfieldId]);
+  }, [subfieldId, selectedTopicId]);
+
+  const handleTopicSelected = (topicId) => {
+    setSelectedTopicId(topicId);
+  };
 
   if (error) {
     return <div>Error: {error}</div>;
   }
 
   return (
-    <div
-      style={{
-        width: "100%",
+    <Grid2
+      container
+      wrap="no-wrap"
+      sx={{
         height: "calc(100vh - 280px)",
-        display: "flex",
-        flexDirection: "column",
       }}
     >
-      {loading || works.length === 0 ? (
-        <Loader />
-      ) : (
-        <div style={{ flex: 1, overflow: "hidden" }}>
-          <ForceDirectedGraph works={works} />
-        </div>
-      )}
-    </div>
+      <TopicSelector
+        subfieldId={subfieldId}
+        selectedTopicId={selectedTopicId}
+        onTopicSelected={handleTopicSelected}
+        subfieldName={subfieldName}
+        routePath={`/influential/${subfieldId}/works`}
+      />
+
+      <Divider orientation="vertical" />
+
+      <Grid2
+        size={9}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        overflow="hidden"
+      >
+        {loading || works.length === 0 ? (
+          <Loader />
+        ) : (
+          <div style={{ width: "100%", height: "100%" }}>
+            <ForceDirectedGraph works={works} />
+          </div>
+        )}
+      </Grid2>
+    </Grid2>
   );
 };

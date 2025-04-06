@@ -644,7 +644,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Add a legend for edge types
     const edgeLegend = svg
       .append("g")
-      .attr("transform", `translate(5, ${height - 50})`)
+      .attr("transform", `translate(20, ${height - 40})`)
       .attr("class", "edge-legend");
 
     edgeLegend
@@ -692,7 +692,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Add node type color legend
     const typeLegend = svg
       .append("g")
-      .attr("transform", `translate(5, 40)`)
+      .attr("transform", `translate(20, 40)`)
       .attr("class", "type-legend");
 
     // Title for the type legend
