@@ -566,7 +566,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Create foreign objects for Material-UI icons in zoom controls
     const zoomControls = svg
       .append("g")
-      .attr("transform", `translate(${width - 40}, 20)`)
+      .attr("transform", `translate(${width - 40}, 14)`)
       .attr("class", "zoom-controls");
 
     // Helper function to create a control button with Material-UI icon
@@ -644,10 +644,13 @@ export const ForceDirectedGraph = ({ works }) => {
     // Add a legend for edge types
     const edgeLegend = svg
       .append("g")
-      .attr("transform", `translate(20, ${height - 40})`)
+      .attr("transform", `translate(28, ${height - 48})`)
       .attr("class", "edge-legend");
 
-    edgeLegend
+    // Create a group for all content to measure its bounds later
+    const edgeLegendContent = edgeLegend.append("g");
+
+    edgeLegendContent
       .append("text")
       .attr("x", 0)
       .attr("y", -18)
@@ -656,7 +659,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .text("Connection Types");
 
     // Outgoing edge
-    edgeLegend
+    edgeLegendContent
       .append("line")
       .attr("x1", 0)
       .attr("y1", 0)
@@ -665,7 +668,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("stroke", "#007bff")
       .attr("stroke-width", 2);
 
-    edgeLegend
+    edgeLegendContent
       .append("text")
       .attr("x", 35)
       .attr("y", 4)
@@ -673,7 +676,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("font-size", "10px");
 
     // Incoming edge
-    edgeLegend
+    edgeLegendContent
       .append("line")
       .attr("x1", 0)
       .attr("y1", 20)
@@ -682,21 +685,40 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("stroke", "#28a745")
       .attr("stroke-width", 2);
 
-    edgeLegend
+    edgeLegendContent
       .append("text")
       .attr("x", 35)
       .attr("y", 24)
       .text("Citation")
       .attr("font-size", "10px");
 
-    // Add node type color legend
+    // Get the bounding box of all elements in edgeLegendContent
+    const edgeLegendBBox = edgeLegendContent.node().getBBox();
+
+    // Add background with increased padding based on actual content size
+    edgeLegend
+      .insert("rect", ":first-child")
+      .attr("x", edgeLegendBBox.x - 15)
+      .attr("y", edgeLegendBBox.y - 12)
+      .attr("width", edgeLegendBBox.width + 34)
+      .attr("height", edgeLegendBBox.height + 24)
+      .attr("fill", "rgba(255, 255, 255, 1)")
+      .attr("rx", 5)
+      .attr("ry", 5)
+      .attr("stroke", "#ddd")
+      .attr("stroke-width", 1);
+
+    // Add node type color legend with improved background
     const typeLegend = svg
       .append("g")
-      .attr("transform", `translate(20, 40)`)
+      .attr("transform", `translate(28, 48)`)
       .attr("class", "type-legend");
 
+    // Create a group for all content to measure its bounds
+    const typeLegendContent = typeLegend.append("g");
+
     // Title for the type legend
-    typeLegend
+    typeLegendContent
       .append("text")
       .attr("x", 0)
       .attr("y", -10)
@@ -720,7 +742,7 @@ export const ForceDirectedGraph = ({ works }) => {
       const rgb = assignRGBColor(item.type);
 
       // Color circle
-      typeLegend
+      typeLegendContent
         .append("circle")
         .attr("cx", 10)
         .attr("cy", y + 10)
@@ -730,13 +752,29 @@ export const ForceDirectedGraph = ({ works }) => {
         .attr("stroke-width", 1);
 
       // Type label
-      typeLegend
+      typeLegendContent
         .append("text")
         .attr("x", 25)
         .attr("y", y + 14)
         .attr("font-size", "10px")
         .text(item.label);
     });
+
+    // Get the bounding box of all elements in typeLegendContent
+    const typeLegendBBox = typeLegendContent.node().getBBox();
+
+    // Add background with increased padding based on actual content size
+    typeLegend
+      .insert("rect", ":first-child")
+      .attr("x", typeLegendBBox.x - 15)
+      .attr("y", typeLegendBBox.y - 12)
+      .attr("width", typeLegendBBox.width + 34)
+      .attr("height", typeLegendBBox.height + 24)
+      .attr("fill", "rgba(255, 255, 255, 1)")
+      .attr("rx", 5)
+      .attr("ry", 5)
+      .attr("stroke", "#ddd")
+      .attr("stroke-width", 1);
 
     // Automatically resize handling
     window.addEventListener("resize", fitView);
