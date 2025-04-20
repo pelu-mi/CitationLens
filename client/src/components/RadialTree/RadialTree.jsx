@@ -1,11 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { useNavigate } from "react-router";
 import { extractId } from "../../utils/extractId";
 
 export const RadialTree = ({ data }) => {
   const svgRef = useRef(null);
+  const containerRef = useRef(null);
   const navigate = useNavigate();
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   // Color generation function to create distinct colors for branches
   const generateBranchColors = (root) => {
@@ -63,7 +65,7 @@ export const RadialTree = ({ data }) => {
     const text = d3.select(textNode);
     const textContent = text.text();
     const words = textContent.split(/\s+/).reverse();
-    const lineHeight = 1.4; // ems
+    const lineHeight = 1.25; // ems
     const x = text.attr("x");
     const y = text.attr("y") || 0;
     const dy = parseFloat(text.attr("dy") || 0);
@@ -99,25 +101,55 @@ export const RadialTree = ({ data }) => {
     }
   };
 
+  // Update dimensions on resize
   useEffect(() => {
-    if (!data || !svgRef.current) return;
+    if (!containerRef.current) return;
+
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        setDimensions({ width, height });
+      }
+    };
+
+    updateDimensions();
+
+    const resizeObserver = new ResizeObserver(updateDimensions);
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      if (containerRef.current) {
+        resizeObserver.unobserve(containerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      !data ||
+      !svgRef.current ||
+      dimensions.width === 0 ||
+      dimensions.height === 0
+    )
+      return;
 
     // Clear any existing SVG content
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    // Specify the chart's dimensions.
-    const width = 2400;
-    const height = width;
-    const cx = width * 0.5;
-    const cy = height * 0.5;
-    const radius = Math.min(width, height) / 2 - 360;
+    // Dynamic radius calculation based on container size
+    const minDimension = Math.min(dimensions.width, dimensions.height);
+    const radius = (minDimension / 2) * 0.77; // Use 80% of available space for the tree
+
+    // Center coordinates
+    const cx = dimensions.width / 2;
+    const cy = dimensions.height / 2 - 10;
 
     // Set up SVG
     svg
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", [0, 0, width, height])
+      .attr("width", dimensions.width)
+      .attr("height", dimensions.height)
+      .attr("viewBox", [0, 0, dimensions.width, dimensions.height])
       .attr("style", "width: 100%; height: 100%; font: 18px sans-serif;");
 
     // Create a container group for zooming
@@ -142,7 +174,7 @@ export const RadialTree = ({ data }) => {
     // Zoom functionality
     const zoom = d3
       .zoom()
-      .scaleExtent([1, 10]) // Limit zoom levels
+      .scaleExtent([0.9, 10]) // Allow zooming out slightly more
       .filter((event) => {
         // Disable double-click zoom behavior
         return !event.type.includes("dblclick");
@@ -159,7 +191,7 @@ export const RadialTree = ({ data }) => {
       .append("g")
       .attr("fill", "none")
       .attr("stroke-opacity", 0.4)
-      .attr("stroke-width", 1.5)
+      .attr("stroke-width", 1)
       .attr("class", "links");
 
     // Append links
@@ -194,14 +226,18 @@ export const RadialTree = ({ data }) => {
         return branchColors.get(d) || "#999";
       })
       .attr("r", (d) => {
-        // Increase size for root and first level nodes
-        if (d.depth <= 1) return 6; // Root node & First level children
-        return 3; // Other nodes
+        // Scale node size based on viewport size
+        const baseSize = minDimension / 1200;
+        if (d.depth <= 1) return baseSize * 4; // Root node & First level children
+        return baseSize * 3; // Other nodes
       })
       .attr("class", "node");
 
     // Label group with improved positioning and interaction
     const labelGroup = container.append("g").attr("class", "labels");
+
+    // Scale font size based on viewport
+    const fontSizeScale = minDimension / 1200; // Scale factor for font sizes
 
     const labels = labelGroup
       .selectAll()
@@ -217,9 +253,9 @@ export const RadialTree = ({ data }) => {
       .attr("x", (d) => {
         // Adjust position based on depth for better spacing
         if (d.depth === 0) {
-          return d.x < Math.PI ? -12 : 12;
+          return d.x < Math.PI ? -6 : 6;
         }
-        return d.x < Math.PI === !d.children ? 12 : -12;
+        return d.x < Math.PI === !d.children ? 6 : -6;
       })
       .attr("text-anchor", (d) => {
         return d.x < Math.PI === !d.children ? "start" : "end";
@@ -228,10 +264,10 @@ export const RadialTree = ({ data }) => {
       .attr("stroke", "white")
       .attr("stroke-width", 3)
       .attr("font-size", (d) => {
-        // Increase font size based on node depth
-        if (d.depth === 0) return "28px"; // Root node
-        if (d.depth === 1) return "24px"; // First level children
-        return "18px"; // Other nodes
+        // Adjust font size based on viewport size
+        if (d.depth === 0) return `${Math.max(4, 18 * fontSizeScale)}px`; // Root node
+        if (d.depth === 1) return `${Math.max(2, 14 * fontSizeScale)}px`; // First level children
+        return `${Math.max(2, 11 * fontSizeScale)}px`; // Other nodes
       })
       .attr("font-weight", (d) => {
         // Make root and first level labels bold
@@ -243,13 +279,15 @@ export const RadialTree = ({ data }) => {
       .text((d) => d.data.display_name)
       .each(function (d) {
         // Only wrap text for nodes with longer labels and non-leaf nodes
-        if (d.data.display_name.length > 15) {
+        if (d.data.display_name.length > 14) {
+          // Scale the max width based on viewport size
+          const baseWidth = minDimension / 25;
           const maxWidth =
             d.depth === 0
-              ? 240 // Root node
+              ? baseWidth * 2 // Root node
               : d.depth === 1
-              ? 230 // First level
-              : 550; // Other nodes
+              ? baseWidth * 2.6 // First level
+              : baseWidth * 4.5; // Other nodes
           wrapText(this, maxWidth);
         }
       })
@@ -326,7 +364,7 @@ export const RadialTree = ({ data }) => {
             .duration(200)
             .style("opacity", 1)
             .attr("stroke", nodeColor)
-            .attr("stroke-width", 3);
+            .attr("stroke-width", 1.5);
         });
       })
       .on("mouseleave", (event) => {
@@ -351,7 +389,7 @@ export const RadialTree = ({ data }) => {
           .duration(0)
           .style("opacity", 1)
           .attr("stroke", (d) => branchColors.get(d.target) || "#555")
-          .attr("stroke-width", 1.5);
+          .attr("stroke-width", 1);
 
         labels
           .transition()
@@ -372,15 +410,24 @@ export const RadialTree = ({ data }) => {
 
     // Center the container and apply initial zoom
     container.attr("transform", `translate(${cx},${cy})`);
-    const initialZoom = d3.zoomIdentity.translate(cx, cy).scale(1);
+
+    // Calculate appropriate initial zoom level based on tree size
+    // and container dimensions
+    const initialScale = 0.9; // Slightly smaller to show the whole tree
+    const initialZoom = d3.zoomIdentity.translate(cx, cy).scale(initialScale);
     svg.call(zoom.transform, initialZoom);
-  }, [data]);
+  }, [data, dimensions]);
 
   return (
-    <svg
-      id="redial-tree"
-      ref={svgRef}
-      style={{ maxWidth: "100%", height: "auto", cursor: "move" }}
-    />
+    <div
+      ref={containerRef}
+      style={{ width: "100%", height: "100%", position: "relative" }}
+    >
+      <svg
+        id="radial-tree"
+        ref={svgRef}
+        style={{ width: "100%", height: "100%" }}
+      />
+    </div>
   );
 };
