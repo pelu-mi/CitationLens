@@ -58,6 +58,47 @@ export const RadialTree = ({ data }) => {
     return assignUniqueColors(root);
   };
 
+  // Function to wrap text labels
+  const wrapText = (textNode, width) => {
+    const text = d3.select(textNode);
+    const textContent = text.text();
+    const words = textContent.split(/\s+/).reverse();
+    const lineHeight = 1.4; // ems
+    const x = text.attr("x");
+    const y = text.attr("y") || 0;
+    const dy = parseFloat(text.attr("dy") || 0);
+
+    text.text(null); // Clear existing text
+
+    let line = [];
+    let lineNumber = 0;
+    let word;
+    let tspan = text
+      .append("tspan")
+      .attr("x", x)
+      .attr("y", y)
+      .attr("dy", dy + "em");
+
+    while (words.length > 0) {
+      word = words.pop();
+      line.push(word);
+      tspan.text(line.join(" "));
+
+      // Check if line is too long
+      if (tspan.node().getComputedTextLength() > width && line.length > 1) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text
+          .append("tspan")
+          .attr("x", x)
+          .attr("y", y)
+          .attr("dy", ++lineNumber * lineHeight + dy + "em")
+          .text(word);
+      }
+    }
+  };
+
   useEffect(() => {
     if (!data || !svgRef.current) return;
 
@@ -152,7 +193,11 @@ export const RadialTree = ({ data }) => {
         if (d.children) return branchColors.get(d) || "#555";
         return branchColors.get(d) || "#999";
       })
-      .attr("r", 2.5)
+      .attr("r", (d) => {
+        // Increase size for root and first level nodes
+        if (d.depth <= 1) return 6; // Root node & First level children
+        return 3; // Other nodes
+      })
       .attr("class", "node");
 
     // Label group with improved positioning and interaction
@@ -170,7 +215,11 @@ export const RadialTree = ({ data }) => {
       })
       .attr("dy", "0.31em")
       .attr("x", (d) => {
-        return d.x < Math.PI === !d.children ? 10 : -10;
+        // Adjust position based on depth for better spacing
+        if (d.depth === 0) {
+          return d.x < Math.PI ? -12 : 12;
+        }
+        return d.x < Math.PI === !d.children ? 12 : -12;
       })
       .attr("text-anchor", (d) => {
         return d.x < Math.PI === !d.children ? "start" : "end";
@@ -178,10 +227,32 @@ export const RadialTree = ({ data }) => {
       .attr("paint-order", "stroke")
       .attr("stroke", "white")
       .attr("stroke-width", 3)
+      .attr("font-size", (d) => {
+        // Increase font size based on node depth
+        if (d.depth === 0) return "28px"; // Root node
+        if (d.depth === 1) return "24px"; // First level children
+        return "20px"; // Other nodes
+      })
+      .attr("font-weight", (d) => {
+        // Make root and first level labels bold
+        return d.depth <= 1 ? "bold" : "normal";
+      })
       .attr("fill", "currentColor")
       .style("cursor", (d) => (!d.children ? "pointer" : "default"))
-      .text((d) => d.data.display_name)
       .attr("class", "label")
+      .text((d) => d.data.display_name)
+      .each(function (d) {
+        // Only wrap text for nodes with longer labels and non-leaf nodes
+        if (d.data.display_name.length > 15) {
+          const maxWidth =
+            d.depth === 0
+              ? 240 // Root node
+              : d.depth === 1
+              ? 230 // First level
+              : 550; // Other nodes
+          wrapText(this, maxWidth);
+        }
+      })
       .on("mouseenter", (event, hoveredNode) => {
         // Reset any previous hover state before applying new highlighting
         container
