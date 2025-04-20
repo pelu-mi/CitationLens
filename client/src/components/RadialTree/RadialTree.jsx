@@ -231,7 +231,7 @@ export const RadialTree = ({ data }) => {
         // Increase font size based on node depth
         if (d.depth === 0) return "28px"; // Root node
         if (d.depth === 1) return "24px"; // First level children
-        return "20px"; // Other nodes
+        return "18px"; // Other nodes
       })
       .attr("font-weight", (d) => {
         // Make root and first level labels bold
@@ -254,6 +254,12 @@ export const RadialTree = ({ data }) => {
         }
       })
       .on("mouseenter", (event, hoveredNode) => {
+        // Make the hovered label bold
+        d3.select(event.currentTarget)
+          .transition()
+          .duration(50)
+          .attr("font-weight", "bold");
+
         // Reset any previous hover state before applying new highlighting
         container
           .selectAll(".node, .link, .label")
@@ -323,7 +329,13 @@ export const RadialTree = ({ data }) => {
             .attr("stroke-width", 3);
         });
       })
-      .on("mouseleave", () => {
+      .on("mouseleave", (event) => {
+        // Reset font weight to normal for nodes that aren't root or first level
+        d3.select(event.currentTarget)
+          .transition()
+          .duration(50)
+          .attr("font-weight", (d) => (d.depth <= 1 ? "bold" : "normal"));
+
         // Restore all elements to original state
         nodes
           .transition()
