@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { useNavigate } from "react-router";
 import { extractId } from "../../utils/extractId";
+import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import { createRoot } from "react-dom/client";
 
 export const RadialTree = ({ data }) => {
   const svgRef = useRef(null);
@@ -123,6 +127,46 @@ export const RadialTree = ({ data }) => {
       }
     };
   }, []);
+
+  // Helper function to create a control button with Material-UI icon
+  function createControlButton(svg, g, y, onClick, IconComponent, label) {
+    // Create a foreign object to host the React component
+    const foreignObject = g
+      .append("foreignObject")
+      .attr("x", 0)
+      .attr("y", y)
+      .attr("width", 36)
+      .attr("height", 36)
+      .attr("cursor", "pointer");
+
+    // Create a div element inside the foreignObject
+    const div = document.createElement("div");
+    div.style.width = "36px";
+    div.style.height = "36px";
+    div.style.backgroundColor = "#fefefe";
+    div.style.border = "1px solid #ccc";
+    div.style.borderRadius = "5px";
+    div.style.display = "flex";
+    div.style.justifyContent = "center";
+    div.style.alignItems = "center";
+    div.style.cursor = "pointer";
+    div.title = label;
+
+    // Append the div to the foreignObject
+    foreignObject.node().appendChild(div);
+
+    // Create a React root and render the icon
+    const root = createRoot(div);
+    root.render(<IconComponent style={{ fontSize: "20px", color: "#555" }} />);
+
+    // Add click event listener
+    div.addEventListener("click", (event) => {
+      event.stopPropagation();
+      onClick();
+    });
+
+    return foreignObject;
+  }
 
   useEffect(() => {
     if (
@@ -416,7 +460,53 @@ export const RadialTree = ({ data }) => {
     const initialScale = 0.9; // Slightly smaller to show the whole tree
     const initialZoom = d3.zoomIdentity.translate(cx, cy).scale(initialScale);
     svg.call(zoom.transform, initialZoom);
-  }, [data, dimensions]);
+
+    // Fit view function to center and show all nodes
+    const fitView = () => {
+      // Apply the initial zoom transformation to fit the entire visualization
+      svg.transition().duration(300).call(zoom.transform, initialZoom);
+    };
+
+    // Create zoom controls group at the top right
+    const zoomControls = svg
+      .append("g")
+      .attr("transform", `translate(${dimensions.width - 36}, 14)`)
+      .attr("class", "zoom-controls");
+
+    // Add zoom in button
+    createControlButton(
+      svg,
+      zoomControls,
+      0,
+      () => {
+        svg.transition().duration(300).call(zoom.scaleBy, 1.3);
+      },
+      AddIcon,
+      "Zoom In"
+    );
+
+    // Add zoom out button
+    createControlButton(
+      svg,
+      zoomControls,
+      45,
+      () => {
+        svg.transition().duration(300).call(zoom.scaleBy, 0.7);
+      },
+      RemoveIcon,
+      "Zoom Out"
+    );
+
+    // Add fit view button
+    createControlButton(
+      svg,
+      zoomControls,
+      90,
+      fitView,
+      CenterFocusStrongIcon,
+      "Fit View"
+    );
+  }, [data, dimensions, navigate]);
 
   return (
     <div

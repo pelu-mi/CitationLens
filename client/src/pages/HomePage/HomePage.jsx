@@ -67,7 +67,8 @@ export const HomePage = () => {
         justifyContent="space-between"
         alignItems="center"
         flexWrap="wrap"
-        p={2}
+        mt={3}
+        mb={2}
       >
         <Typography
           variant="h4"
