@@ -65,7 +65,7 @@ export const InfluentialPage = () => {
         sx={{
           wordWrap: "break-word",
           marginTop: 1,
-          marginBottom: 4,
+          marginBottom: 3,
         }}
       >
         {subfieldName}
