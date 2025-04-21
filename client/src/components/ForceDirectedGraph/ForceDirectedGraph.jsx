@@ -374,11 +374,6 @@ export const ForceDirectedGraph = ({ works }) => {
       activeNodeRef.current = d;
       activeNodeElementRef.current = nodeElement;
 
-      // Get neighbor counts
-      const neighbors = findNeighbors(d.id);
-
-      const [r, g, b] = assignRGBColor(d.type);
-
       // Update tooltip content with incoming/outgoing counts
       tooltip.html(`
         <strong>${d.title}</strong><br>
@@ -641,10 +636,44 @@ export const ForceDirectedGraph = ({ works }) => {
       "Fit View"
     );
 
+    // Add a title legend at the top left
+    const titleLegend = svg
+      .append("g")
+      .attr("transform", `translate(28, 44)`)
+      .attr("class", "title-legend");
+
+    // Create a group for the content
+    const titleLegendContent = titleLegend.append("g");
+
+    // Add the title text
+    titleLegendContent
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("font-size", "1.4993rem")
+      .attr("font-weight", "600")
+      .text(`Top ${works.length} Works`);
+
+    // Get the bounding box of the title text
+    const titleLegendBBox = titleLegendContent.node().getBBox();
+
+    // Add background with padding
+    titleLegend
+      .insert("rect", ":first-child")
+      .attr("x", titleLegendBBox.x - 15)
+      .attr("y", titleLegendBBox.y - 12)
+      .attr("width", titleLegendBBox.width + 32)
+      .attr("height", titleLegendBBox.height + 24)
+      .attr("fill", "rgba(255, 255, 255, 1)")
+      .attr("rx", 5)
+      .attr("ry", 5)
+      .attr("stroke", "#ddd")
+      .attr("stroke-width", 1);
+
     // Add a legend for edge types
     const edgeLegend = svg
       .append("g")
-      .attr("transform", `translate(28, ${height - 48})`)
+      .attr("transform", `translate(${width - 126}, ${height - 48})`)
       .attr("class", "edge-legend");
 
     // Create a group for all content to measure its bounds later
@@ -711,7 +740,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Add node type color legend with improved background
     const typeLegend = svg
       .append("g")
-      .attr("transform", `translate(28, 48)`)
+      .attr("transform", `translate(28, ${height - 140})`)
       .attr("class", "type-legend");
 
     // Create a group for all content to measure its bounds
