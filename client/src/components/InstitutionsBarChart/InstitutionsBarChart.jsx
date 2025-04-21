@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export const InstitutionsBarChart = ({ data }) => {
   const containerRef = useRef(null);
@@ -43,9 +43,9 @@ export const InstitutionsBarChart = ({ data }) => {
     const xAxisSvg = d3
       .select(xAxisRef.current)
       .attr("width", containerWidth)
-      .attr("height", 60)
+      .attr("height", 50)
       .append("g")
-      .attr("transform", `translate(${margin.left}, 55)`);
+      .attr("transform", `translate(${margin.left}, 45)`);
 
     const xAxis = d3.axisTop(x).ticks(10);
     xAxisSvg
@@ -253,10 +253,12 @@ export const InstitutionsBarChart = ({ data }) => {
         position: "relative", // Important for absolute positioning of tooltip
       }}
     >
+      <Typography variant="h5">Top {data.length} Institutions</Typography>
+
       {/* Fixed header with x-axis */}
       <Box
         sx={{
-          height: "60px",
+          height: "50px",
           width: "100%",
           position: "sticky",
           top: 0,
