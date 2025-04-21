@@ -561,7 +561,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Create foreign objects for Material-UI icons in zoom controls
     const zoomControls = svg
       .append("g")
-      .attr("transform", `translate(${width - 40}, 14)`)
+      .attr("transform", `translate(${width - 40}, 10)`)
       .attr("class", "zoom-controls");
 
     // Helper function to create a control button with Material-UI icon
@@ -639,7 +639,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Add a title legend at the top left
     const titleLegend = svg
       .append("g")
-      .attr("transform", `translate(28, 44)`)
+      .attr("transform", `translate(22, 42)`)
       .attr("class", "title-legend");
 
     // Create a group for the content
@@ -673,7 +673,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Add a legend for edge types
     const edgeLegend = svg
       .append("g")
-      .attr("transform", `translate(${width - 126}, ${height - 48})`)
+      .attr("transform", `translate(${width - 126}, ${height - 46})`)
       .attr("class", "edge-legend");
 
     // Create a group for all content to measure its bounds later
@@ -740,7 +740,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Add node type color legend with improved background
     const typeLegend = svg
       .append("g")
-      .attr("transform", `translate(28, ${height - 140})`)
+      .attr("transform", `translate(22, ${height - 138})`)
       .attr("class", "type-legend");
 
     // Create a group for all content to measure its bounds
