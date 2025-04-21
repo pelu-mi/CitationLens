@@ -57,7 +57,7 @@ export const HomePage = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100%",
+        height: "calc(100vh - 64px - 30px)",
         width: "100%",
         overflow: "hidden",
       }}

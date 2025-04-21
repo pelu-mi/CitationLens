@@ -59,7 +59,7 @@ export const WorksTab = () => {
       container
       wrap="no-wrap"
       sx={{
-        height: "calc(100vh - 280px)",
+        height: "calc(100vh - 259px - 30px)",
       }}
     >
       <TopicSelector

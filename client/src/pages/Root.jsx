@@ -9,7 +9,7 @@ export const Root = () => {
       <Route
         path="/"
         element={
-          <PageLayout>
+          <PageLayout disableFullHeight>
             <HomePage />
           </PageLayout>
         }

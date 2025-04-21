@@ -3,7 +3,7 @@
  */
 import PropTypes from "prop-types";
 
-import { Container, css, GlobalStyles } from "@mui/material";
+import { Container, css, GlobalStyles, Link, Typography } from "@mui/material";
 import { NavBar } from "../NavBar/NavBar";
 
 /**
@@ -29,6 +29,17 @@ export const PageLayout = ({ children, disableFullHeight }) => {
       <Container sx={{ paddingTop: "64px", height: "100%" }}>
         {children}
       </Container>
+      <Typography
+        variant="subtitle2"
+        textAlign="center"
+        sx={{ opacity: 0.4, background: "#efefef", paddingY: "4px" }}
+      >
+        Powered by{" "}
+        <Link href="https://docs.openalex.org/" target="_blank">
+          OpenAlex
+        </Link>
+        , {new Date().getFullYear()}
+      </Typography>
     </>
   );
 };
