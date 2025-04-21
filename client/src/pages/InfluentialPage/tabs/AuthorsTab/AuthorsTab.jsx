@@ -70,9 +70,9 @@ export const AuthorsTab = () => {
       <Grid2
         xs={9}
         paddingRight={3}
-        paddingLeft={5}
-        paddingBottom={3}
-        paddingTop={5}
+        paddingLeft={2}
+        paddingBottom={6}
+        paddingTop={2}
         display="flex"
         justifyContent="center"
         alignItems="center"

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
+import { Box, Typography } from "@mui/material"; // Add this import
 
 export const AuthorsScatterplot = ({ authors }) => {
   const containerRef = useRef(null);
@@ -170,18 +171,24 @@ export const AuthorsScatterplot = ({ authors }) => {
   }, [authors, dimensions]);
 
   return (
-    <div
+    <Box
       ref={containerRef}
-      style={{
+      sx={{
         width: "100%",
         height: "100%",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <div
+      <Typography variant="h5">Top {authors.length} Authors</Typography>
+
+      <Box
         ref={scatterplotRef}
-        style={{
+        sx={{
           width: "100%",
-          height: "100%",
+          flex: 1, // Make the scatterplot take up remaining space
+          pl: 2,
+          pt: 1,
         }}
       />
       <div
@@ -201,6 +208,6 @@ export const AuthorsScatterplot = ({ authors }) => {
           textOverflow: "ellipsis",
         }}
       />
-    </div>
+    </Box>
   );
 };
