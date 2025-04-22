@@ -171,7 +171,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("markerHeight", 6)
       .attr("orient", "auto")
       .append("path")
-      .attr("fill", "#bb915d")
+      .attr("fill", "#bd9361")
       .attr("d", "M0,-5L10,0L0,5");
 
     // Incoming arrow marker (green)
@@ -265,7 +265,7 @@ export const ForceDirectedGraph = ({ works }) => {
           return sourceId === d.id;
         })
         .style("opacity", opacity)
-        .style("stroke", "#bb915d")
+        .style("stroke", "#bd9361")
         .style("stroke-width", 2)
         .attr("marker-end", "url(#arrow-outgoing)");
 
@@ -694,7 +694,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("y1", 0)
       .attr("x2", 30)
       .attr("y2", 0)
-      .attr("stroke", "#bb915d")
+      .attr("stroke", "#bd9361")
       .attr("stroke-width", 2);
 
     edgeLegendContent
