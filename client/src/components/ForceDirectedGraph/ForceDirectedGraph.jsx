@@ -160,7 +160,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("fill", "#999")
       .attr("d", "M0,-5L10,0L0,5");
 
-    // Outgoing arrow marker (blue)
+    // Outgoing arrow marker (brown)
     defs
       .append("marker")
       .attr("id", "arrow-outgoing")
@@ -171,7 +171,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("markerHeight", 6)
       .attr("orient", "auto")
       .append("path")
-      .attr("fill", "#007bff")
+      .attr("fill", "#bb915d")
       .attr("d", "M0,-5L10,0L0,5");
 
     // Incoming arrow marker (green)
@@ -185,7 +185,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("markerHeight", 6)
       .attr("orient", "auto")
       .append("path")
-      .attr("fill", "#28a745")
+      .attr("fill", "#26a69a")
       .attr("d", "M0,-5L10,0L0,5");
 
     // Add links with curved paths
@@ -255,7 +255,7 @@ export const ForceDirectedGraph = ({ works }) => {
         .filter((n) => n.id === d.id || neighbors.all.has(n.id))
         .style("opacity", opacity);
 
-      // Highlight outgoing links (blue)
+      // Highlight outgoing links (brown)
       link
         .filter((l) => {
           const sourceId =
@@ -265,7 +265,7 @@ export const ForceDirectedGraph = ({ works }) => {
           return sourceId === d.id;
         })
         .style("opacity", opacity)
-        .style("stroke", "#007bff")
+        .style("stroke", "#bb915d")
         .style("stroke-width", 2)
         .attr("marker-end", "url(#arrow-outgoing)");
 
@@ -279,7 +279,7 @@ export const ForceDirectedGraph = ({ works }) => {
           return targetId === d.id;
         })
         .style("opacity", opacity)
-        .style("stroke", "#28a745")
+        .style("stroke", "#26a69a")
         .style("stroke-width", 2)
         .attr("marker-end", "url(#arrow-incoming)");
     }
@@ -694,7 +694,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("y1", 0)
       .attr("x2", 30)
       .attr("y2", 0)
-      .attr("stroke", "#007bff")
+      .attr("stroke", "#bb915d")
       .attr("stroke-width", 2);
 
     edgeLegendContent
@@ -711,7 +711,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("y1", 20)
       .attr("x2", 30)
       .attr("y2", 20)
-      .attr("stroke", "#28a745")
+      .attr("stroke", "#26a69a")
       .attr("stroke-width", 2);
 
     edgeLegendContent

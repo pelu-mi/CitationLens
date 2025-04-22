@@ -6,7 +6,7 @@ export function assignRGBColor(workType) {
     "book-chapter": [225, 0.8, 0.85], // Book Chapter: Blue
     dataset: [160, 0.8, 0.75], // Dataset: Green
     preprint: [44, 1, 1], // Preprint: Yellow
-    dissertation: [195, 0.75, 0.9], // Dissertation: Aqua
+    dissertation: [280, 0.6, 0.95], // Dissertation: Purple
     others: [0, 0, 0.55], // Other categories: Grey
   };
 
