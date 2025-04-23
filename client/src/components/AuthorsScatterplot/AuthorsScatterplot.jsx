@@ -1,6 +1,11 @@
+/**
+ * @component AuthorsScatterplot
+ * @description Renders a D3 scatterplot visualization of authors comparing between works count and citations count.
+ */
+
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { Box, Typography } from "@mui/material"; // Add this import
+import { Box, Typography } from "@mui/material";
 
 export const AuthorsScatterplot = ({ authors }) => {
   const containerRef = useRef(null);
@@ -8,7 +13,9 @@ export const AuthorsScatterplot = ({ authors }) => {
   const tooltipRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // Set up resize observer to handle container size changes
+  /**
+   * Set up resize observer to handle container size changes
+   */
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -32,6 +39,9 @@ export const AuthorsScatterplot = ({ authors }) => {
     };
   }, []);
 
+  /**
+   * Create and update D3 scatterplot based on authors data and container dimensions
+   */
   useEffect(() => {
     // Clear any existing plot
     if (!authors.length || !scatterplotRef.current || dimensions.width === 0)
@@ -90,7 +100,7 @@ export const AuthorsScatterplot = ({ authors }) => {
     const tooltip = d3.select(tooltipRef.current);
 
     // Dots
-    const dots = svg
+    svg
       .selectAll(".dot")
       .data(authors)
       .enter()
@@ -186,7 +196,7 @@ export const AuthorsScatterplot = ({ authors }) => {
         ref={scatterplotRef}
         sx={{
           width: "100%",
-          flex: 1, // Make the scatterplot take up remaining space
+          flex: 1,
           pl: 2,
           pt: 1,
         }}

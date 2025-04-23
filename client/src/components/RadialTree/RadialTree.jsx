@@ -1,3 +1,8 @@
+/**
+ * @component RadialTree
+ * @description Renders an interactive D3 radial tree visualization of domain hierarchy with zoom controls and node highlighting.
+ */
+
 import { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { useNavigate } from "react-router";
@@ -13,7 +18,9 @@ export const RadialTree = ({ data }) => {
   const navigate = useNavigate();
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // Color generation function to create distinct colors for branches
+  /**
+   * Generate distinct colors for different branches in the tree
+   */
   const generateBranchColors = (root) => {
     const colorMap = new Map();
 
@@ -64,7 +71,9 @@ export const RadialTree = ({ data }) => {
     return assignUniqueColors(root);
   };
 
-  // Function to wrap text labels
+  /**
+   * Handle text wrapping for node labels
+   */
   const wrapText = (textNode, width) => {
     const text = d3.select(textNode);
     const textContent = text.text();
@@ -105,7 +114,9 @@ export const RadialTree = ({ data }) => {
     }
   };
 
-  // Update dimensions on resize
+  /**
+   * Update dimensions on window resize
+   */
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -128,7 +139,9 @@ export const RadialTree = ({ data }) => {
     };
   }, []);
 
-  // Helper function to create a control button with Material-UI icon
+  /**
+   * Function to create a control button with Material-UI icon
+   */
   function createControlButton(svg, g, y, onClick, IconComponent, label) {
     // Create a foreign object to host the React component
     const foreignObject = g
@@ -168,6 +181,9 @@ export const RadialTree = ({ data }) => {
     return foreignObject;
   }
 
+  /**
+   * Create and update D3 radial tree visualization
+   */
   useEffect(() => {
     if (
       !data ||
@@ -183,7 +199,7 @@ export const RadialTree = ({ data }) => {
 
     // Dynamic radius calculation based on container size
     const minDimension = Math.min(dimensions.width, dimensions.height);
-    const radius = (minDimension / 2) * 0.77; // Use 80% of available space for the tree
+    const radius = (minDimension / 2) * 0.77;
 
     // Center coordinates
     const cx = dimensions.width / 2;
@@ -205,7 +221,7 @@ export const RadialTree = ({ data }) => {
       .size([2 * Math.PI, radius])
       .separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth);
 
-    // Sort the tree and apply the layout.
+    // Sort the tree and apply the layout
     const root = tree(
       d3
         .hierarchy(data)
@@ -218,7 +234,7 @@ export const RadialTree = ({ data }) => {
     // Zoom functionality
     const zoom = d3
       .zoom()
-      .scaleExtent([0.9, 10]) // Allow zooming out slightly more
+      .scaleExtent([0.9, 10])
       .filter((event) => {
         // Disable double-click zoom behavior
         return !event.type.includes("dblclick");
@@ -277,11 +293,11 @@ export const RadialTree = ({ data }) => {
       })
       .attr("class", "node");
 
-    // Label group with improved positioning and interaction
+    // Label group
     const labelGroup = container.append("g").attr("class", "labels");
 
     // Scale font size based on viewport
-    const fontSizeScale = minDimension / 1200; // Scale factor for font sizes
+    const fontSizeScale = minDimension / 1200;
 
     const labels = labelGroup
       .selectAll()
@@ -322,7 +338,7 @@ export const RadialTree = ({ data }) => {
       .attr("class", "label")
       .text((d) => d.data.display_name)
       .each(function (d) {
-        // Only wrap text for nodes with longer labels and non-leaf nodes
+        // Wrap text
         if (d.data.display_name.length > 14) {
           // Scale the max width based on viewport size
           const baseWidth = minDimension / 25;
@@ -442,7 +458,7 @@ export const RadialTree = ({ data }) => {
           .attr("fill", "currentColor");
       })
       .on("click", (event, d) => {
-        // Only navigate for leaf nodes
+        // Navigate for leaf nodes (subfields) to Influential page
         if (!d.children && d.data.id) {
           let subfieldId = extractId(d.data.id);
           let subfieldName = d.data.display_name;
@@ -455,19 +471,20 @@ export const RadialTree = ({ data }) => {
     // Center the container and apply initial zoom
     container.attr("transform", `translate(${cx},${cy})`);
 
-    // Calculate appropriate initial zoom level based on tree size
-    // and container dimensions
-    const initialScale = 0.9; // Slightly smaller to show the whole tree
+    // Calculate appropriate initial zoom level based on tree size and container dimensions
+    const initialScale = 0.9;
     const initialZoom = d3.zoomIdentity.translate(cx, cy).scale(initialScale);
     svg.call(zoom.transform, initialZoom);
 
-    // Fit view function to center and show all nodes
+    /**
+     * Function to center and fit all nodes in view
+     */
     const fitView = () => {
       // Apply the initial zoom transformation to fit the entire visualization
       svg.transition().duration(300).call(zoom.transform, initialZoom);
     };
 
-    // Create zoom controls group at the top right
+    // Create zoom controls group
     const zoomControls = svg
       .append("g")
       .attr("transform", `translate(${dimensions.width - 36}, 14)`)
