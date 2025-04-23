@@ -13,6 +13,9 @@ import { Loader } from "../../../../components/Loader/Loader";
 import { ForceDirectedGraph } from "../../../../components/ForceDirectedGraph/ForceDirectedGraph";
 import { TopicSelector } from "../../../../components/TopicSelector/TopicSelector";
 
+/**
+ * Works Tab
+ */
 export const WorksTab = () => {
   const { subfieldId } = useParams();
   const location = useLocation();

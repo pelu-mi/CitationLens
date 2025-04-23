@@ -11,6 +11,9 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { createRoot } from "react-dom/client";
 
+/**
+ * Force-Directed Graph
+ */
 export const ForceDirectedGraph = ({ works }) => {
   const svgRef = useRef(null);
   const containerRef = useRef(null);

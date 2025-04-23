@@ -12,6 +12,9 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { createRoot } from "react-dom/client";
 
+/**
+ * Radial Tree
+ */
 export const RadialTree = ({ data }) => {
   const svgRef = useRef(null);
   const containerRef = useRef(null);

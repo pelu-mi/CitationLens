@@ -31,6 +31,9 @@ const getTabValue = (name) => {
   }
 };
 
+/**
+ * Influential Page
+ */
 export const InfluentialPage = () => {
   const { subfieldId, tabName } = useParams();
   const {

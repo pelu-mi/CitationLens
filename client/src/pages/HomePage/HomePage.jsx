@@ -11,6 +11,9 @@ import { Loader } from "../../components/Loader/Loader";
 import { useNavigate, useParams } from "react-router";
 import { extractId } from "../../utils/extractId";
 
+/**
+ * Home Page
+ */
 export const HomePage = () => {
   const { domainId } = useParams();
   const navigate = useNavigate();

@@ -6,6 +6,9 @@
 import { Container, css, GlobalStyles, Link, Typography } from "@mui/material";
 import { NavBar } from "../NavBar/NavBar";
 
+/**
+ * Page Layout
+ */
 export const PageLayout = ({ children, disableFullHeight }) => {
   return (
     <>

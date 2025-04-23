@@ -7,6 +7,9 @@ import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { Box, Typography } from "@mui/material";
 
+/**
+ * Authors Scatterplot
+ */
 export const AuthorsScatterplot = ({ authors }) => {
   const containerRef = useRef(null);
   const scatterplotRef = useRef(null);

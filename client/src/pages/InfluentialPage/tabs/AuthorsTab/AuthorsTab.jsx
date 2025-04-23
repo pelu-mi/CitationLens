@@ -12,6 +12,9 @@ import { Loader } from "../../../../components/Loader/Loader";
 import { AuthorsScatterplot } from "../../../../components/AuthorsScatterplot/AuthorsScatterplot";
 import { TopicSelector } from "../../../../components/TopicSelector/TopicSelector";
 
+/**
+ * Authors Tab
+ */
 export const AuthorsTab = () => {
   const { subfieldId } = useParams();
   const location = useLocation();

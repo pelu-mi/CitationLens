@@ -22,6 +22,9 @@ import { fetchAllOpenAlexData } from "../../services/helpers/fetchAllOpenAlexDat
 import { extractId } from "../../utils/extractId";
 import { Loader } from "../Loader/Loader";
 
+/**
+ * Topic Selector
+ */
 export const TopicSelector = ({
   subfieldId,
   selectedTopicId,

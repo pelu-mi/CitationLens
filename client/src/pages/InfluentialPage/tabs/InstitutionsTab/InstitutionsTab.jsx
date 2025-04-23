@@ -12,6 +12,9 @@ import { openAlexApiClient } from "../../../../services/openAlexApiClient";
 import { TopicSelector } from "../../../../components/TopicSelector/TopicSelector";
 import { InstitutionsBarChart } from "../../../../components/InstitutionsBarChart/InstitutionsBarChart";
 
+/**
+ * Institutions Tab
+ */
 export const InstitutionsTab = () => {
   const { subfieldId } = useParams();
   const location = useLocation();

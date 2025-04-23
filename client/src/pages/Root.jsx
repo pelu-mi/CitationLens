@@ -8,6 +8,9 @@ import { HomePage } from "./HomePage/HomePage";
 import { InfluentialPage } from "./InfluentialPage/InfluentialPage";
 import { PageLayout } from "../components/PageLayout/PageLayout";
 
+/**
+ * Root
+ */
 export const Root = () => {
   return (
     <Routes>

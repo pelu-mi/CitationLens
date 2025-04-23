@@ -7,6 +7,9 @@ import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import { Box, Typography } from "@mui/material";
 
+/**
+ * Institutions Bar Chart
+ */
 export const InstitutionsBarChart = ({ data }) => {
   const containerRef = useRef(null);
   const chartRef = useRef(null);
