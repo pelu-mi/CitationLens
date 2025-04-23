@@ -1,6 +1,8 @@
 /**
- * Import Modules
+ * @component NavBar
+ * @description Application navigation bar.
  */
+
 import { Box, Container, Toolbar } from "@mui/material";
 import { StyledAppBar, StyledNavLogo } from "./NavBar.styled";
 import { useNavigate } from "react-router";

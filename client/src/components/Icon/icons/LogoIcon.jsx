@@ -1,9 +1,13 @@
 /**
- * Import Modules
+ * @component LogoIcon
+ * @description Renders an SVG icon of the application logo.
  */
+
 import { SvgIcon } from "@mui/material";
 
-// Logo Icon
+/**
+ * Logo Icon
+ */
 export const LogoIcon = (props) => {
   return (
     <SvgIcon {...props}>

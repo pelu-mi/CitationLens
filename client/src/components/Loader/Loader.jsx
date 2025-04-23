@@ -1,6 +1,8 @@
 /**
- * Import Modules
+ * @component Loader
+ * @description A flexible loading indicator component that displays either circular or linear progress based on provided props.
  */
+
 import { Box, CircularProgress, LinearProgress } from "@mui/material";
 
 /**
