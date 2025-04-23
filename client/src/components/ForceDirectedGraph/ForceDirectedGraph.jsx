@@ -19,7 +19,9 @@ export const ForceDirectedGraph = ({ works }) => {
   const activeNodeElementRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // Resize observer to update graph dimensions
+  /**
+   * Resize observer to update graph dimensions
+   */
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -39,6 +41,9 @@ export const ForceDirectedGraph = ({ works }) => {
     };
   }, []);
 
+  /**
+   * Create and update D3 force-directed graph based on works data and container dimensions
+   */
   useEffect(() => {
     if (
       !works.length ||
