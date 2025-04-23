@@ -1,3 +1,8 @@
+/**
+ * @component InfluBreadcrumbs
+ * @description Displays navigation breadcrumbs.
+ */
+
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "@mui/material/Link";
