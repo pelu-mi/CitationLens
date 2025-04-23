@@ -21,6 +21,7 @@ export const AuthorsTab = () => {
   const [selectedTopicId, setSelectedTopicId] = useState(null);
   const [authors, setAuthors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const {
     state: { subfieldName },
@@ -47,6 +48,7 @@ export const AuthorsTab = () => {
         setAuthors(response.data.results);
       } catch (error) {
         console.error("Error fetching authors:", error);
+        setError("Failed to fetch authors data");
         setAuthors([]);
       } finally {
         setLoading(false);
@@ -62,6 +64,10 @@ export const AuthorsTab = () => {
   const handleTopicSelected = (topicId) => {
     setSelectedTopicId(topicId);
   };
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <Grid2

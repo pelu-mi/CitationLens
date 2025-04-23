@@ -21,6 +21,7 @@ export const InstitutionsTab = () => {
   const [selectedTopicId, setSelectedTopicId] = useState(null);
   const [institutions, setInstitutions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const {
     state: { subfieldName },
   } = location;
@@ -46,6 +47,7 @@ export const InstitutionsTab = () => {
         setInstitutions(response.data.group_by);
       } catch (error) {
         console.error("Error fetching institutions:", error);
+        setError("Failed to fetch institutions data");
         setInstitutions([]);
       } finally {
         setLoading(false);
@@ -61,6 +63,10 @@ export const InstitutionsTab = () => {
   const handleTopicSelected = (topicId) => {
     setSelectedTopicId(topicId);
   };
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <Grid2
