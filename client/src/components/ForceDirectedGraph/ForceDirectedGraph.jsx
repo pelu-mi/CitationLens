@@ -1,3 +1,8 @@
+/**
+ * @component ForceDirectedGraph
+ * @description Displays an interactive network visualization of works and their references using D3 force-directed layout.
+ */
+
 import { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import { assignRGBColor } from "../../utils/assignRGBColor";
@@ -78,7 +83,7 @@ export const ForceDirectedGraph = ({ works }) => {
       }
     });
 
-    // Use actual dimensions from state
+    // Use dimensions from state
     const width = dimensions.width;
     const height = dimensions.height;
 
@@ -135,6 +140,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Apply zoom to the SVG
     svg.call(zoom);
 
+    // Function to create curved path for links
     function linkArc(d) {
       const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
       return `
@@ -399,7 +405,7 @@ export const ForceDirectedGraph = ({ works }) => {
       event.stopPropagation();
     }
 
-    // Function to hide tooltip
+    // Function to hide tooltip and reset node highlighting
     function hideTooltip() {
       tooltip.style("opacity", 0).on("transitionend", function () {
         if (parseFloat(tooltip.style("opacity")) === 0) {
@@ -438,15 +444,15 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("stroke-width", 1.5)
       .attr("cursor", "pointer")
       .on("mouseover", (event, d) => {
-        // Only highlight on hover, don't show tooltip
+        // Highlight on hover, don't show tooltip
         highlightConnections(d);
       })
       .on("mouseout", () => {
-        // Only reset highlighting if we don't have an active node
+        // Reset highlighting if there's no an active node
         if (!activeNodeRef.current) {
           resetHighlighting();
         } else {
-          // If we have an active node, restore its highlighting
+          // If there's an active node, restore its highlighting
           highlightConnections(activeNodeRef.current);
         }
       })
@@ -455,7 +461,7 @@ export const ForceDirectedGraph = ({ works }) => {
         if (activeNodeRef.current && activeNodeRef.current.id === d.id) {
           hideTooltip();
         } else {
-          // Otherwise show tooltip for this node, passing the node's group element
+          // Otherwise show tooltip for this node
           showTooltip(event, d, this.parentNode);
         }
 
@@ -472,7 +478,7 @@ export const ForceDirectedGraph = ({ works }) => {
 
     // Fit view function to calculate appropriate zoom level
     const fitView = () => {
-      // Let the simulation run for a bit to position nodes
+      // Let the simulation run to position nodes
       for (let i = 0; i < 120; ++i) simulation.tick();
 
       // Get bounds of all nodes
@@ -499,7 +505,7 @@ export const ForceDirectedGraph = ({ works }) => {
       const graphWidth = maxX - minX;
       const graphHeight = maxY - minY;
 
-      const scale = Math.min(width / graphWidth, height / graphHeight) * 0.9; // Add some margin
+      const scale = Math.min(width / graphWidth, height / graphHeight) * 0.9;
 
       const translateX = width / 2 - (scale * (minX + maxX)) / 2;
       const translateY = height / 2 - (scale * (minY + maxY)) / 2;
@@ -527,7 +533,7 @@ export const ForceDirectedGraph = ({ works }) => {
 
     fitView();
 
-    // Drag functionality
+    // Function to configure node drag behavior
     function drag(simulation) {
       function dragstarted(event, d) {
         if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -558,13 +564,13 @@ export const ForceDirectedGraph = ({ works }) => {
         .on("end", dragended);
     }
 
-    // Create foreign objects for Material-UI icons in zoom controls
+    // Create Material-UI icons in zoom controls
     const zoomControls = svg
       .append("g")
       .attr("transform", `translate(${width - 40}, 10)`)
       .attr("class", "zoom-controls");
 
-    // Helper function to create a control button with Material-UI icon
+    // Function to create a control button with Material-UI icon
     function createControlButton(y, onClick, IconComponent, label) {
       // Create a foreign object to host the React component
       const foreignObject = zoomControls
@@ -606,7 +612,7 @@ export const ForceDirectedGraph = ({ works }) => {
       return foreignObject;
     }
 
-    // Zoom in button with ZoomInIcon
+    // Zoom in button
     createControlButton(
       0,
       () => {
@@ -616,7 +622,7 @@ export const ForceDirectedGraph = ({ works }) => {
       "Zoom In"
     );
 
-    // Zoom out button with ZoomOutIcon
+    // Zoom out button
     createControlButton(
       45,
       () => {
@@ -626,7 +632,7 @@ export const ForceDirectedGraph = ({ works }) => {
       "Zoom Out"
     );
 
-    // Reset/Fit view button with CenterFocusStrongIcon
+    // Reset/Fit view button
     createControlButton(
       90,
       () => {
@@ -636,7 +642,7 @@ export const ForceDirectedGraph = ({ works }) => {
       "Fit View"
     );
 
-    // Add a title legend at the top left
+    // Add a title legend
     const titleLegend = svg
       .append("g")
       .attr("transform", `translate(22, 42)`)
@@ -724,7 +730,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Get the bounding box of all elements in edgeLegendContent
     const edgeLegendBBox = edgeLegendContent.node().getBBox();
 
-    // Add background with increased padding based on actual content size
+    // Add background with increased padding based on content size
     edgeLegend
       .insert("rect", ":first-child")
       .attr("x", edgeLegendBBox.x - 15)
@@ -755,7 +761,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("font-size", "12px")
       .text("Work Types");
 
-    // Define the document types from assignRGBColor
+    // Define the document types
     const documentTypes = [
       { type: "article", label: "Article" },
       { type: "book", label: "Book / Book Chapter" },
@@ -792,7 +798,7 @@ export const ForceDirectedGraph = ({ works }) => {
     // Get the bounding box of all elements in typeLegendContent
     const typeLegendBBox = typeLegendContent.node().getBBox();
 
-    // Add background with increased padding based on actual content size
+    // Add background with increased padding based on content size
     typeLegend
       .insert("rect", ":first-child")
       .attr("x", typeLegendBBox.x - 15)
@@ -805,7 +811,7 @@ export const ForceDirectedGraph = ({ works }) => {
       .attr("stroke", "#ddd")
       .attr("stroke-width", 1);
 
-    // Automatically resize handling
+    // Resize handling
     window.addEventListener("resize", fitView);
 
     return () => {
