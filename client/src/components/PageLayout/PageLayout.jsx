@@ -1,17 +1,15 @@
 /**
- * Import Modules
+ * @component PageLayout
+ * @description Consistent layout structure with navigation, content container and footer
  */
-import PropTypes from "prop-types";
 
 import { Container, css, GlobalStyles, Link, Typography } from "@mui/material";
 import { NavBar } from "../NavBar/NavBar";
 
-/**
- * Page Layout
- */
 export const PageLayout = ({ children, disableFullHeight }) => {
   return (
     <>
+      {/* Apply full-height styles unless disabled */}
       {!disableFullHeight && (
         <GlobalStyles
           styles={css`
@@ -25,10 +23,15 @@ export const PageLayout = ({ children, disableFullHeight }) => {
         />
       )}
 
+      {/* Navigation bar component */}
       <NavBar />
+
+      {/* Main content container with top padding to account for fixed navbar */}
       <Container sx={{ paddingTop: "64px", height: "100%" }}>
         {children}
       </Container>
+
+      {/* Footer with attribution */}
       <Typography
         variant="subtitle2"
         textAlign="center"
@@ -42,10 +45,4 @@ export const PageLayout = ({ children, disableFullHeight }) => {
       </Typography>
     </>
   );
-};
-
-// Specify types of props to be received by PageLayout
-PageLayout.propTypes = {
-  children: PropTypes.node,
-  disableFullHeight: PropTypes.bool,
 };

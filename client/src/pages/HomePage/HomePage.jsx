@@ -1,3 +1,8 @@
+/**
+ * @component HomePage
+ * @description Displays an interactive visualization of academic domains hierarchy using a radial tree.
+ */
+
 import { useEffect, useState } from "react";
 import { RadialTree } from "../../components/RadialTree/RadialTree";
 import { Autocomplete, Box, TextField, Typography } from "@mui/material";
@@ -10,11 +15,15 @@ export const HomePage = () => {
   const { domainId } = useParams();
   const navigate = useNavigate();
 
+  // State variables
   const [treeData, setTreeData] = useState([]);
   const [selectedDomain, setSelectedDomain] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  /**
+   * Fetch domain hierarchy data and set initial domain
+   */
   useEffect(() => {
     const getData = async () => {
       setLoading(true);
@@ -22,7 +31,7 @@ export const HomePage = () => {
         const hierarchyData = await fetchDomainsHierarchy();
         setTreeData(hierarchyData);
 
-        // Find the initial domain
+        // Find the initial domain from URL or default to first domain
         let initialDomain = null;
         if (domainId) {
           initialDomain = hierarchyData.find(
@@ -30,9 +39,7 @@ export const HomePage = () => {
           );
         }
 
-        // If no domain found from URL, use the first domain
         initialDomain = initialDomain || hierarchyData[0];
-
         setSelectedDomain(initialDomain);
       } catch (err) {
         setError(err);
@@ -45,6 +52,9 @@ export const HomePage = () => {
     getData();
   }, [domainId]);
 
+  /**
+   *  Handle domain selection and update URL
+   */
   const handleDomainChange = (event, newDomain) => {
     if (newDomain) {
       setSelectedDomain(newDomain);

@@ -1,3 +1,8 @@
+/**
+ * @component Root
+ * @description Main routing component that defines application routes and layouts
+ */
+
 import { Route, Routes } from "react-router";
 import { HomePage } from "./HomePage/HomePage";
 import { InfluentialPage } from "./InfluentialPage/InfluentialPage";
@@ -6,6 +11,7 @@ import { PageLayout } from "../components/PageLayout/PageLayout";
 export const Root = () => {
   return (
     <Routes>
+      {/* Home route with optional domain parameter */}
       <Route
         path="/"
         element={
@@ -17,6 +23,8 @@ export const Root = () => {
         <Route path="*" />
         <Route path=":domainId" />
       </Route>
+
+      {/* Influential page routes with subfield and tab parameters */}
       <Route
         path="/influential"
         element={
