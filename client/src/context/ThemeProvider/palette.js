@@ -1,3 +1,4 @@
+// Light Palette
 export const lightPalette = {
   primary: {
     main: "#0074D9",
@@ -29,6 +30,7 @@ export const lightPalette = {
   },
 };
 
+// Dark Palette
 export const darkPalette = {
   primary: {
     main: "#75B8FF",

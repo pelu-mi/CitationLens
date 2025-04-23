@@ -1,3 +1,8 @@
+/**
+ * @function fetchDomainsHierarchy
+ * @description Fetches and structures the academic domains hierarchy from OpenAlex API
+ */
+
 import { fetchAllOpenAlexData } from "../../helpers/fetchAllOpenAlexData";
 
 export async function fetchDomainsHierarchy() {
@@ -8,7 +13,7 @@ export async function fetchDomainsHierarchy() {
       fetchAllOpenAlexData("/fields"),
     ]);
 
-    // // Create a map of domains to their fields
+    // Create a map of domains to their fields
     const fieldsMap = fieldsData.reduce((acc, field) => {
       if (field.domain) {
         const domainId = field.domain.id;
@@ -24,14 +29,13 @@ export async function fetchDomainsHierarchy() {
       return acc;
     }, {});
 
-    // Transform domains and fields
+    // Transform domains and fields into hierarchical structure
     const transformedDomains = domainsData.map((domain) => ({
       display_name: domain.display_name,
       id: domain.id,
       children: fieldsMap[domain.id],
     }));
 
-    // Create the final hierarchical structure
     return transformedDomains;
   } catch (error) {
     console.error("Error fetching OpenAlex hierarchy:", error);

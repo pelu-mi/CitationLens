@@ -1,11 +1,13 @@
 /**
- * Import Modules
+ * @function getTheme
+ * @description Creates and configures the Material UI theme with custom settings for light and dark modes
  */
+
 import { createTheme, responsiveFontSizes } from "@mui/material";
 import { darkPalette, lightPalette } from "./palette";
 
 /**
- * Theme
+ * Get a responsive theme
  */
 const getTheme = (mode) => {
   const theme = createTheme({

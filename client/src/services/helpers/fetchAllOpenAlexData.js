@@ -1,3 +1,8 @@
+/**
+ * @function fetchAllOpenAlexData
+ * @description Retrieves all data from OpenAlex API by handling pagination
+ */
+
 import { openAlexApiClient } from "../openAlexApiClient";
 
 export async function fetchAllOpenAlexData(endpoint) {
@@ -5,6 +10,7 @@ export async function fetchAllOpenAlexData(endpoint) {
   let page = 1;
   let hasMoreResults = true;
 
+  // Fetch data pages until all results are retrieved
   while (hasMoreResults) {
     try {
       const response = await openAlexApiClient.get(endpoint, {
@@ -17,7 +23,7 @@ export async function fetchAllOpenAlexData(endpoint) {
       const results = response.data.results;
       allResults.push(...results);
 
-      // Check if we've fetched all results
+      // Check if all results are fetched
       if (results.length < 200) {
         hasMoreResults = false;
       } else {

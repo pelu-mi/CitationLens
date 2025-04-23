@@ -1,3 +1,7 @@
+/**
+ * @function assignRGBColor
+ * @description Maps work types to specific RGB colors
+ */
 export function assignRGBColor(workType) {
   // Define HSB color values for each work type
   const colorMap = {
@@ -13,7 +17,9 @@ export function assignRGBColor(workType) {
   // Get the appropriate HSB values
   let [h, s, v] = colorMap[workType.toLowerCase()] || colorMap["others"];
 
-  // Convert HSB to RGB
+  /**
+   * Converts HSB color values to RGB format
+   */
   function hsbToRgb(h, s, b) {
     let c = b * s;
     let x = c * (1 - Math.abs(((h / 60) % 2) - 1));

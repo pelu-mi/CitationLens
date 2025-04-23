@@ -1,6 +1,8 @@
 /**
- * Import Modules
+ * @component ThemeProvider
+ * @description Wraps the application with Material UI theme provider and global styles
  */
+
 import {
   CssBaseline,
   GlobalStyles,
