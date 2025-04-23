@@ -1,3 +1,9 @@
+/**
+ * @component WorksTab
+ * @description Tab component for displaying academic works as a force-directed graph
+ * with topic selection
+ */
+
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { Divider, Grid2 } from "@mui/material";
@@ -16,6 +22,9 @@ export const WorksTab = () => {
   const [selectedTopicId, setSelectedTopicId] = useState(null);
   const subfieldName = location.state?.subfieldName;
 
+  /**
+   * Fetch works when selected topic changes
+   */
   useEffect(() => {
     const fetchWorks = async () => {
       if (!subfieldId || !selectedTopicId) return;
@@ -46,6 +55,9 @@ export const WorksTab = () => {
     fetchWorks();
   }, [subfieldId, selectedTopicId]);
 
+  /**
+   * Handle topic selection
+   */
   const handleTopicSelected = (topicId) => {
     setSelectedTopicId(topicId);
   };

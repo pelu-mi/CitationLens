@@ -1,3 +1,9 @@
+/**
+ * @component InstitutionsTab
+ * @description Tab component for displaying influential institutions as a bar chart
+ * with topic selection
+ */
+
 import { Divider, Grid2 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router";
@@ -16,7 +22,9 @@ export const InstitutionsTab = () => {
     state: { subfieldName },
   } = location;
 
-  // Fetch the number of works for 100 institutions when selected topic changes
+  /**
+   * Fetch institutions data when selected topic changes
+   */
   useEffect(() => {
     const fetchInstitutions = async () => {
       if (!selectedTopicId) return;
@@ -44,6 +52,9 @@ export const InstitutionsTab = () => {
     fetchInstitutions();
   }, [selectedTopicId, subfieldId]);
 
+  /**
+   * Handle topic selection
+   */
   const handleTopicSelected = (topicId) => {
     setSelectedTopicId(topicId);
   };

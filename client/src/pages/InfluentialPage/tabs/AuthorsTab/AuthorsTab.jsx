@@ -1,3 +1,9 @@
+/**
+ * @component AuthorsTab
+ * @description Tab component for displaying influential authors in a scatterplot
+ * with topic selection
+ */
+
 import { Divider, Grid2 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router";
@@ -17,7 +23,9 @@ export const AuthorsTab = () => {
     state: { subfieldName },
   } = location;
 
-  // Fetch authors when selected topic changes
+  /**
+   * Fetch authors when selected topic changes
+   */
   useEffect(() => {
     const fetchAuthors = async () => {
       if (!selectedTopicId) return;
@@ -45,6 +53,9 @@ export const AuthorsTab = () => {
     fetchAuthors();
   }, [selectedTopicId]);
 
+  /**
+   * Handle topic selection
+   */
   const handleTopicSelected = (topicId) => {
     setSelectedTopicId(topicId);
   };

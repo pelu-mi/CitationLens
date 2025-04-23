@@ -1,3 +1,9 @@
+/**
+ * @component InfluentialPage
+ * @description Page for displaying influential institutions, authors, and works in a subfield
+ * with tab navigation
+ */
+
 import { Divider, Typography } from "@mui/material";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -11,6 +17,9 @@ import { InstitutionsTab } from "./tabs/InstitutionsTab/InstitutionsTab";
 import { WorksTab } from "./tabs/WorksTab/WorksTab";
 import { AuthorsTab } from "./tabs/AuthorsTab/AuthorsTab";
 
+/**
+ * Convert tab name to numerical value for Tabs component
+ */
 const getTabValue = (name) => {
   switch (name) {
     case "authors":
@@ -33,6 +42,9 @@ export const InfluentialPage = () => {
   const searchParams = new URLSearchParams(location.search);
   const topicParam = searchParams.get("topic");
 
+  /**
+   * Handle tab click and update URL
+   */
   const handleClickTab = (tabName, param) => {
     let destination = `/influential/${subfieldId}/${tabName}`;
 
@@ -46,6 +58,9 @@ export const InfluentialPage = () => {
     setTabValue(getTabValue(tabName));
   };
 
+  /**
+   * Render appropriate tab content based on selected tab
+   */
   const renderTabContent = (tabValue) => {
     switch (tabValue) {
       case 1:
