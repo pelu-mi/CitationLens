@@ -1,3 +1,8 @@
+/**
+ * @component TopicSelector
+ * @description Displays a searchable list of topics for a specific subfield with selection capability
+ */
+
 import {
   Box,
   Divider,
@@ -30,12 +35,14 @@ export const TopicSelector = ({
   const [filteredTopics, setFilteredTopics] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  // Use this flag to block navigation-triggered reloads when user clicks
+  // Flag to block navigation-triggered reloads when user clicks
   const isUserAction = useRef(false);
   // Internal selected ID that doesn't depend on the prop
   const [internalSelectedId, setInternalSelectedId] = useState(selectedTopicId);
 
-  // Sync internal state with prop on initial load and prop changes
+  /**
+   * Sync internal state with props when they change
+   */
   useEffect(() => {
     // Only update from props if not from user click
     if (!isUserAction.current) {
@@ -46,7 +53,9 @@ export const TopicSelector = ({
     }
   }, [selectedTopicId]);
 
-  // Fetch topics when component mounts or subfieldId changes
+  /**
+   * Fetch topics when component mounts or subfieldId changes
+   */
   useEffect(() => {
     if (!subfieldId) return;
 
@@ -107,7 +116,9 @@ export const TopicSelector = ({
     loadTopics();
   }, [subfieldId]);
 
-  // Apply search filter whenever topics or searchTerm changes
+  /**
+   * Filter topics based on search term
+   */
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredTopics(topics);
@@ -122,13 +133,16 @@ export const TopicSelector = ({
     setFilteredTopics(filtered);
   }, [topics, searchTerm]);
 
+  /**
+   * Handle topic selection and update URL
+   */
   const handleListItemClick = (topicId) => {
     // Set user action flag
     isUserAction.current = true;
 
     // Only process if it's actually a new selection
     if (topicId !== internalSelectedId) {
-      // Update internal state first
+      // Update internal state
       setInternalSelectedId(topicId);
 
       // Call parent callback before navigation
@@ -141,11 +155,14 @@ export const TopicSelector = ({
         state: {
           subfieldName,
         },
-        replace: true, // Use replace to avoid history stack building up
+        replace: true,
       });
     }
   };
 
+  /**
+   * Handle search input changes
+   */
   const handleSearchTopics = (event) => {
     const value = event.target.value;
     setSearchTerm(value);
