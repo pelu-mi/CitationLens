@@ -1,3 +1,8 @@
+/**
+ * @component InstitutionsBarChart
+ * @description Displays a horizontal bar chart of institutions with their publication counts
+ */
+
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import { Box, Typography } from "@mui/material";
@@ -8,6 +13,9 @@ export const InstitutionsBarChart = ({ data }) => {
   const xAxisRef = useRef(null);
   const tooltipRef = useRef(null);
 
+  /**
+   * Renders D3 bar chart with institutions data
+   */
   useEffect(() => {
     if (!data || data.length === 0) return;
 
@@ -110,7 +118,7 @@ export const InstitutionsBarChart = ({ data }) => {
         }
         return d.key_display_name;
       })
-      .append("title") // Add full name as tooltip
+      .append("title")
       .text((d) => d.key_display_name);
 
     // Bar
@@ -122,7 +130,7 @@ export const InstitutionsBarChart = ({ data }) => {
       .attr("width", (d) => x(d.count))
       .attr("height", barHeight)
       .attr("fill", "#1976d2")
-      .attr("rx", 3); // Rounded corners
+      .attr("rx", 3);
 
     // Count label
     institutions
@@ -144,7 +152,7 @@ export const InstitutionsBarChart = ({ data }) => {
     // Add hover interaction to the entire group
     institutions
       .on("mouseover", function (event, d) {
-        // First, make tooltip visible but fully transparent for measurement
+        // Make tooltip visible but fully transparent for measurement
         tooltip.style("opacity", 0).style("visibility", "visible");
 
         // Set tooltip content
@@ -213,9 +221,9 @@ export const InstitutionsBarChart = ({ data }) => {
         // Highlight the count label
         d3.select(this)
           .select(".count-label")
-          .attr("fill", "#0d47a1") // Darker blue color
+          .attr("fill", "#0d47a1")
           .attr("font-weight", "bold")
-          .attr("font-size", "12px"); // Slightly larger font
+          .attr("font-size", "12px");
       })
       .on("mouseout", function () {
         // Hide tooltip
@@ -250,7 +258,7 @@ export const InstitutionsBarChart = ({ data }) => {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        position: "relative", // Important for absolute positioning of tooltip
+        position: "relative",
       }}
     >
       <Typography variant="h5">Top {data.length} Institutions</Typography>
