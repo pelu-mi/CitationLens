@@ -4,7 +4,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/pelu-mi/CitationLens">
-    <img src="client/public/logo-transparent.svg" alt="Logo" width="80" height="80">
+    <img src="client/public/fav-icon-citation-lens.svg" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">CitationLens</h3>
